@@ -98,9 +98,7 @@ public class TranslateClient {
                                     .build(),
                             HttpResponse.BodyHandlers.ofString());
 
-            final String responseBody = client.body();
-
-
+            var responseBody = client.body();
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
             return null;
