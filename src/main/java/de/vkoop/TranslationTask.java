@@ -18,6 +18,9 @@ public class TranslationTask implements Callable<Integer> {
     @Option(names = "-c")
     File configurationFile;
 
+    @Option(names = "-f", description = "load configuration from home. E.g. ~/.transcli.properties")
+    boolean loadConfigFromHome;
+
     @Option(names = "-k")
     String authKey;
 
@@ -62,18 +65,22 @@ public class TranslationTask implements Callable<Integer> {
     }
 
     private void loadConfigFromFile() {
-        if (authKey == null && configurationFile == null) {
+        if (authKey == null && configurationFile == null && !loadConfigFromHome) {
             System.exit(1);
-        } else if (configurationFile != null) {
+        } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
             try {
-                properties.load(new FileInputStream(configurationFile));
+                final FileInputStream inStream = (loadConfigFromHome)
+                        ? new FileInputStream(System.getProperty("user.home") + File.separator + ".transcli.properties")
+                        : new FileInputStream(configurationFile);
+
+                properties.load(inStream);
                 Optional.ofNullable(properties.getProperty("authKey"))
                         .ifPresent(value -> this.authKey = value);
                 Optional.ofNullable(properties.getProperty("sourceLanguage"))
                         .ifPresent(value -> this.sourceLanguage = value);
                 Optional.ofNullable(properties.getProperty("targetLanguages"))
-                        .map(value -> List.of( value.split(",")))
+                        .map(value -> List.of(value.split(",")))
                         .ifPresent(value -> this.targetLanguages = value);
             } catch (IOException e) {
                 System.err.println("Failed to load file: " + configurationFile);
