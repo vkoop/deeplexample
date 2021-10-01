@@ -42,7 +42,7 @@ class TranslationTaskTest {
     public void integrationTest(){
         final TranslationTask translationTask = CommandLine.populateCommand(new TranslationTask(), defaultArgs);
         translationTask.setTranslateClient(client);
-        translationTask.call();
+        translationTask.run();
 
         Mockito.verify(client).translate(Mockito.eq(text), Mockito.eq(sourceLanguage), Mockito.eq("EN"));
         Mockito.verify(client).translate(Mockito.eq(text), Mockito.eq(sourceLanguage), Mockito.eq("FR"));

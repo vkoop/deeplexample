@@ -1,7 +1,7 @@
 package de.vkoop;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.vkoop.data.Response;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +11,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Set;
 
 public class TranslateClient {
@@ -99,21 +98,11 @@ public class TranslateClient {
                             HttpResponse.BodyHandlers.ofString());
 
             var responseBody = client.body();
+
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
+            System.out.println(e);
             return null;
-        }
-    }
-
-    public static class Response {
-        @JsonProperty("translations")
-        public List<Translation> translations;
-
-        public static class Translation {
-            @JsonProperty("detected_source_language")
-            public String detectedSourceLanguage;
-            @JsonProperty("text")
-            public String text;
         }
     }
 

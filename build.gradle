@@ -1,37 +1,28 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
-    //id 'application'
+    id 'io.quarkus'
 }
 
 group 'org.example'
 version '1.0-SNAPSHOT'
 
-//application {
-//    mainClass.set("de.vkoop.App")
-//}
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'de.vkoop.App'
-    }
-}
-
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-    options.compilerArgs += ["-Aproject=${project.name}"]
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
 }
 
 dependencies {
+    implementation 'io.quarkus:quarkus-picocli'
     def jacksonVersion = '2.12.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-    implementation 'info.picocli:picocli:4.6.1'
 
 
     def junitVersion = '5.7.0'
@@ -43,6 +34,9 @@ dependencies {
 // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.2'
 
+
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-arc'
 }
 
 test {

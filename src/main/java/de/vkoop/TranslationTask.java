@@ -1,5 +1,6 @@
 package de.vkoop;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -10,10 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class TranslationTask implements Callable<Integer> {
+@CommandLine.Command
+public class TranslationTask implements Runnable {
 
     @Option(names = "-c")
     File configurationFile;
@@ -36,7 +37,7 @@ public class TranslationTask implements Callable<Integer> {
     private TranslateClient translateClient;
 
     @Override
-    public Integer call() {
+    public void run() {
         loadConfigFromFile();
 
         if (!TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains(sourceLanguage)) {
@@ -60,8 +61,6 @@ public class TranslationTask implements Callable<Integer> {
                 .collect(Collectors.joining(";"));
 
         System.out.println(translatedCsvLine);
-
-        return 0;
     }
 
     private void loadConfigFromFile() {
