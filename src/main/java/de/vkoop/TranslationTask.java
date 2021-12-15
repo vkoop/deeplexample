@@ -65,6 +65,7 @@ public class TranslationTask implements Runnable {
 
     private void loadConfigFromFile() {
         if (authKey == null && configurationFile == null && !loadConfigFromHome) {
+            System.err.println("Not authentication provided will exit.");
             System.exit(1);
         } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
