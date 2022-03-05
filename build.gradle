@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'io.quarkus'
 
-    id 'com.github.ben-manes.versions' version '0.39.0'
+    id 'com.github.ben-manes.versions' version '0.42.0'
 
 }
 
@@ -28,14 +28,14 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
 
 
-    def junitVersion = '5.7.0'
+    def junitVersion = '5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:' + junitVersion
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:' + junitVersion
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.3.1'
 // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.11.2'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.3.1'
 
 
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
