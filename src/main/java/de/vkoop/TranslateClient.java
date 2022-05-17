@@ -86,25 +86,25 @@ public class TranslateClient {
     public Response translate(String text, String sourceLanguage, String targetLanguage) {
         try {
 
+            final URI uri = new URI(String.format("https://api-free.deepl.com/v2/translate?" +
+                    "auth_key=%s&text=%s" +
+                    "&target_lang=%s" +
+                    "&source_lang=%s", authKey, URLEncoder.encode(text, StandardCharsets.UTF_8), targetLanguage, sourceLanguage));
+
             var client = HttpClient.newHttpClient()
                     .send(
                             HttpRequest.newBuilder()
-                                    .uri(new URI(String.format("https://api-free.deepl.com/v2/translate?" +
-                                            "auth_key=%s&text=%s" +
-                                            "&target_lang=%s" +
-                                            "&source_lang=%s", authKey, URLEncoder.encode(text, StandardCharsets.UTF_8), targetLanguage, sourceLanguage)))
+                                    .uri(uri)
+                                    .header("Accept", "application/json")
                                     .GET()
                                     .build(),
                             HttpResponse.BodyHandlers.ofString());
 
             var responseBody = client.body();
-
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
             System.out.println(e);
             return null;
         }
     }
-
-
 }
