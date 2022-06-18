@@ -1,7 +1,6 @@
 package de.vkoop.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.vkoop.TranslateClient;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;
