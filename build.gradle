@@ -1,9 +1,7 @@
 plugins {
     id 'java'
-    id 'io.quarkus'
-
+    id 'application'
     id 'com.github.ben-manes.versions' version '0.42.0'
-
 }
 
 group 'org.example'
@@ -14,6 +12,10 @@ repositories {
     mavenLocal()
 }
 
+application {
+    mainClass = 'de.vkoop.AppStarter'
+}
+
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -22,7 +24,10 @@ compileJava {
 }
 
 dependencies {
-    implementation 'io.quarkus:quarkus-picocli'
+    implementation 'info.picocli:picocli:4.6.3'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+
+
     def jacksonVersion = '2.12.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
@@ -36,10 +41,10 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.6.1'
 // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.6.1'
+}
 
-
-    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation 'io.quarkus:quarkus-arc'
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
 test {

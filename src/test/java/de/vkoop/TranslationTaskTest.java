@@ -1,14 +1,16 @@
 package de.vkoop;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import picocli.CommandLine;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class TranslationTaskTest {
@@ -32,10 +34,10 @@ class TranslationTaskTest {
     public void testParameterBinding() {
         final TranslationTask translationTask = CommandLine.populateCommand(new TranslationTask(), defaultArgs);
 
-        Assertions.assertEquals(authkey, translationTask.authKey);
-        Assertions.assertEquals(text, translationTask.text);
-        Assertions.assertEquals(sourceLanguage, translationTask.sourceLanguage);
-        Assertions.assertEquals(targetLanguages, translationTask.targetLanguages);
+        assertEquals(authkey, translationTask.authKey);
+        assertEquals(text, translationTask.text);
+        assertEquals(sourceLanguage, translationTask.sourceLanguage);
+        assertEquals(targetLanguages, translationTask.targetLanguages);
     }
 
     @Test
@@ -44,8 +46,8 @@ class TranslationTaskTest {
         translationTask.setTranslateClient(client);
         translationTask.run();
 
-        Mockito.verify(client).translate(Mockito.eq(text), Mockito.eq(sourceLanguage), Mockito.eq("EN"));
-        Mockito.verify(client).translate(Mockito.eq(text), Mockito.eq(sourceLanguage), Mockito.eq("FR"));
+        verify(client).translate(eq(text), eq(sourceLanguage), eq("EN"));
+        verify(client).translate(eq(text), eq(sourceLanguage), eq("FR"));
     }
 
 }

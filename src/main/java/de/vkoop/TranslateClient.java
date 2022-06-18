@@ -91,8 +91,6 @@ public class TranslateClient {
                     "&target_lang=%s" +
                     "&source_lang=%s", authKey, URLEncoder.encode(text, StandardCharsets.UTF_8), targetLanguage, sourceLanguage));
 
-            System.out.println(uri.toString());
-
             var client = HttpClient.newHttpClient()
                     .send(
                             HttpRequest.newBuilder()
@@ -104,11 +102,8 @@ public class TranslateClient {
 
             var responseBody = client.body();
 
-            System.out.println(responseBody);
-
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
-            System.out.println(e);
             return null;
         }
     }
