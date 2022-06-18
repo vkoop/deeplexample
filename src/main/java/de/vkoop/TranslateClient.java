@@ -101,9 +101,9 @@ public class TranslateClient {
                             HttpResponse.BodyHandlers.ofString());
 
             var responseBody = client.body();
+
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
-            System.out.println(e);
             return null;
         }
     }
