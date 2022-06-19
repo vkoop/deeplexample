@@ -69,10 +69,9 @@ public class TranslationTask implements Runnable {
             System.exit(1);
         } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
-            try {
-                final FileInputStream inStream = (loadConfigFromHome)
-                        ? new FileInputStream(System.getProperty("user.home") + File.separator + ".transcli.properties")
-                        : new FileInputStream(configurationFile);
+            try (FileInputStream inStream = (loadConfigFromHome)
+                    ? new FileInputStream(System.getProperty("user.home") + File.separator + ".transcli.properties")
+                    : new FileInputStream(configurationFile)) {
 
                 properties.load(inStream);
                 Optional.ofNullable(properties.getProperty("authKey"))
