@@ -1,19 +1,20 @@
 package de.vkoop;
 
-import picocli.CommandLine;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-@CommandLine.Command
+@Command
 public class TranslationTask implements Runnable {
 
     @Option(names = "-c")
@@ -31,8 +32,14 @@ public class TranslationTask implements Runnable {
     @Option(names = "-t", split = ",")
     List<String> targetLanguages;
 
-    @Parameters
-    String text;
+    @Option(names = "--json-file")
+    String jsonFile;
+
+    @Option(names = "--json-target-file")
+    String jsonTargetFile;
+
+    @Option(names = "--text")
+    Optional<String> text;
 
     private TranslateClient translateClient;
 
@@ -51,16 +58,34 @@ public class TranslationTask implements Runnable {
             }
         }
 
-        var translatedCsvLine = targetLanguages.stream()
-                .parallel()
-                .map(targetLanguage -> getTranslateClient().translate(text, sourceLanguage, targetLanguage))
-                .filter(Objects::nonNull)
-                .map(response -> response.translations)
-                .map(translations -> translations.isEmpty() ? "" : translations.get(0).text)
-                .map(translation -> "\"" + translation + "\"")
-                .collect(Collectors.joining(";"));
+        if(jsonFile == null){
+            var translatedCsvLine = targetLanguages.stream()
+                    .parallel()
+                    .map(targetLanguage -> getTranslateClient().translate(text.get(), sourceLanguage, targetLanguage))
+                    .filter(Objects::nonNull)
+                    .map(response -> response.translations)
+                    .map(translations -> translations.isEmpty() ? "" : translations.get(0).text)
+                    .map(translation -> "\"" + translation + "\"")
+                    .collect(Collectors.joining(";"));
 
-        System.out.println(translatedCsvLine);
+            System.out.println(translatedCsvLine);
+        } else {
+            JsonTranslator jsonParser = new JsonTranslator(getTranslateClient());
+
+            targetLanguages.stream().parallel()
+                    .forEach(targetLanguage -> {
+                        try {
+                            final Map<String, Object> stringObjectMap = jsonParser.translateJsonFile(jsonFile, sourceLanguage, targetLanguage);
+                            final ObjectMapper objectMapper = new ObjectMapper();
+                            final File resultFile = new File(jsonTargetFile + targetLanguage + ".json");
+                            resultFile.createNewFile();
+                            objectMapper.writeValue(resultFile, stringObjectMap);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+        }
     }
 
     private void loadConfigFromFile() {
