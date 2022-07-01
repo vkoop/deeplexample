@@ -1,0 +1,2 @@
+# DeepL Translations CLI
+
