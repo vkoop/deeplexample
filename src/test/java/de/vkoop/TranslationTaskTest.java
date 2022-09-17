@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import picocli.CommandLine;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,7 +25,7 @@ class TranslationTaskTest {
             "-k=" + authkey,
             "-s=" + sourceLanguage,
             "-t=" + String.join(",", targetLanguages),
-            text
+            "--text=" + text
     };
 
     @Mock
@@ -35,7 +36,7 @@ class TranslationTaskTest {
         final TranslationTask translationTask = CommandLine.populateCommand(new TranslationTask(), defaultArgs);
 
         assertEquals(authkey, translationTask.authKey);
-        assertEquals(text, translationTask.text);
+        assertEquals(Optional.of(text), translationTask.text);
         assertEquals(sourceLanguage, translationTask.sourceLanguage);
         assertEquals(targetLanguages, translationTask.targetLanguages);
     }
