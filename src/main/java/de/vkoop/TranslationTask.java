@@ -1,6 +1,7 @@
 package de.vkoop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -77,9 +78,13 @@ public class TranslationTask implements Runnable {
                         try {
                             final Map<String, Object> stringObjectMap = jsonParser.translateJsonFile(jsonFile, sourceLanguage, targetLanguage);
                             final ObjectMapper objectMapper = new ObjectMapper();
+                            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
                             final File resultFile = new File(jsonTargetFile + targetLanguage + ".json");
                             resultFile.createNewFile();
-                            objectMapper.writeValue(resultFile, stringObjectMap);
+                            objectMapper
+                                    .writerWithDefaultPrettyPrinter()
+                                    .writeValue(resultFile, stringObjectMap);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
