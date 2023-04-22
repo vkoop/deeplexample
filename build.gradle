@@ -27,7 +27,7 @@ dependencies {
     def mockitoVersion = '5.2.0'
     def jacksonVersion = '2.14.2'
     def junitVersion = '5.9.2'
-    def picoliVersion = '4.7.2'
+    def picoliVersion = '4.7.3'
 
     implementation "info.picocli:picocli:$picoliVersion"
     annotationProcessor "info.picocli:picocli-codegen:$picoliVersion"
