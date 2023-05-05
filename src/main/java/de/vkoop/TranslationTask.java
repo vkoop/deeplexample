@@ -80,7 +80,7 @@ public class TranslationTask implements Runnable {
                             final ObjectMapper objectMapper = new ObjectMapper();
                             objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
-                            final File resultFile = new File(jsonTargetFile + targetLanguage + ".json");
+                            final File resultFile = new File(jsonTargetFile != null ? jsonTargetFile : "" + targetLanguage + ".json");
                             resultFile.createNewFile();
                             objectMapper
                                     .writerWithDefaultPrettyPrinter()

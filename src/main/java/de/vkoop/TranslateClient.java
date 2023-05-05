@@ -61,6 +61,7 @@ public class TranslateClient {
             "LT",
             "LV",
             "NL",
+            "NB",
             "PL",
             "PT-PT",
             "PT-BR",
@@ -70,6 +71,7 @@ public class TranslateClient {
             "SK",
             "SL",
             "SV",
+            "TR",
             "ZH"
     );
 
@@ -104,6 +106,7 @@ public class TranslateClient {
 
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
+            System.out.println(e);
             return null;
         }
     }
