@@ -12,39 +12,39 @@ public class MapUtils {
     private MapUtils() {
     }
 
-    public static void setMapValue(Map<String, Object> map, List<String> keyList, String value){
-        if(keyList.isEmpty()){
+    public static void setMapValue(Map<String, Object> map, List<String> keyList, String value) {
+        if (keyList.isEmpty()) {
             //Do nothing...
-        }
-        else if(keyList.size() == 1){
+        } else if (keyList.size() == 1) {
             map.put(keyList.get(0), value);
         } else {
             final String key = keyList.get(0);
             map.computeIfAbsent(key, theKey -> new HashMap<>());
 
-            final List<String> keyList1 = keyList.subList(1, keyList.size() );
-            setMapValue((Map<String, Object>) map.get(key), keyList1, value );
+            final List<String> keyList1 = keyList.subList(1, keyList.size());
+            setMapValue((Map<String, Object>) map.get(key), keyList1, value);
         }
     }
 
     public static Map<String, Object> map(Map<String, Object> nestedMap, UnaryOperator<String> valueTransformer) {
         final Map<String, Object> resultMap = new HashMap<>();
-        traverseMapAccum(nestedMap, (keyList, value) -> setMapValue(resultMap, keyList, valueTransformer.apply(value) ), List.of());
+        traverseMapAccum(nestedMap, (keyList, value) -> setMapValue(resultMap, keyList, valueTransformer.apply(value)), List.of());
         return resultMap;
     }
 
+
     private static void traverseMapAccum(Map<String, Object> nestedMap, BiConsumer<List<String>, String> consumer, List<String> accumulatedKey) {
         for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
-            String k = entry.getKey();
-            Object v = entry.getValue();
+            String key = entry.getKey();
+            Object valueObject = entry.getValue();
 
             final ArrayList<String> accumulatedKeyList = new ArrayList<>(accumulatedKey);
-            accumulatedKeyList.add(k);
+            accumulatedKeyList.add(key);
 
-            if (v instanceof String valueString) {
+            if (valueObject instanceof String valueString) {
                 consumer.accept(accumulatedKeyList, valueString);
-            } else if (v instanceof Map) {
-                traverseMapAccum((Map<String, Object>) nestedMap.get(k), consumer, accumulatedKeyList);
+            } else if (valueObject instanceof Map) {
+                traverseMapAccum((Map<String, Object>) nestedMap.get(key), consumer, accumulatedKeyList);
             }
         }
     }
