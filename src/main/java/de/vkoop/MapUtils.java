@@ -8,6 +8,10 @@ import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
 
 public class MapUtils {
+
+    private MapUtils() {
+    }
+
     public static void setMapValue(Map<String, Object> map, List<String> keyList, String value){
         if(keyList.isEmpty()){
             //Do nothing...
