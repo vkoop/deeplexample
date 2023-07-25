@@ -19,7 +19,7 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@8d49e559aae34d3e0eb16cde532684bc9702762b
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@915a66c096a03101667f9df2e56c9efef558b165
+        uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c
         env:
           SPRING_PROFILES_ACTIVE: test
         with:
