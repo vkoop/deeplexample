@@ -42,6 +42,9 @@ public class TranslationTask implements Runnable {
     @Option(names = "--text")
     Optional<String> text;
 
+    @Option(names = "--output-folder")
+    Optional<String> outputFolder;
+
     private TranslateClient translateClient;
 
     @Override
@@ -59,7 +62,7 @@ public class TranslationTask implements Runnable {
             }
         }
 
-        if(jsonFile == null){
+        if (jsonFile == null) {
             var translatedCsvLine = targetLanguages.stream()
                     .parallel()
                     .map(targetLanguage -> getTranslateClient().translate(text.get(), sourceLanguage, targetLanguage))
@@ -80,7 +83,20 @@ public class TranslationTask implements Runnable {
                             final ObjectMapper objectMapper = new ObjectMapper();
                             objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 
-                            final File resultFile = new File(jsonTargetFile != null ? jsonTargetFile : targetLanguage.toLowerCase().replace('-', '_') + ".json");
+                            final File resultFile;
+                            // if parent folder is defined create the file in the parentfolder
+                            String targetLanguageLowerCase = targetLanguage.toLowerCase().replace('-', '_');
+                            if (outputFolder.isPresent() && jsonTargetFile == null) {
+                                final File parentFolder = new File(outputFolder.get());
+                                if (!parentFolder.exists()) {
+                                    parentFolder.mkdirs();
+                                }
+
+                                resultFile = new File(parentFolder, targetLanguageLowerCase);
+                            } else {
+                                resultFile = new File(Objects.requireNonNullElseGet(jsonTargetFile, () -> targetLanguageLowerCase + ".json"));
+                            }
+
                             resultFile.createNewFile();
                             objectMapper
                                     .writerWithDefaultPrettyPrinter()
