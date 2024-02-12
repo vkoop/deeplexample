@@ -92,7 +92,7 @@ public class TranslationTask implements Runnable {
                                     parentFolder.mkdirs();
                                 }
 
-                                resultFile = new File(parentFolder, targetLanguageLowerCase);
+                                resultFile = new File(parentFolder, targetLanguageLowerCase + ".json");
                             } else {
                                 resultFile = new File(Objects.requireNonNullElseGet(jsonTargetFile, () -> targetLanguageLowerCase + ".json"));
                             }
