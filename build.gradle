@@ -15,11 +15,10 @@ application {
     mainClass = 'de.vkoop.AppStarter'
 }
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    options.encoding = 'UTF-8'
-    options.compilerArgs << '-parameters'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
