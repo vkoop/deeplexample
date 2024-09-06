@@ -15,13 +15,6 @@ application {
     mainClass = 'de.vkoop.AppStarter'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-        vendor = JvmVendorSpec.ADOPTIUM
-    }
-}
-
 dependencies {
     implementation "info.picocli:picocli:$picoliVersion"
     annotationProcessor "info.picocli:picocli-codegen:$picoliVersion"
