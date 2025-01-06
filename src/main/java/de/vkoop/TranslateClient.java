@@ -48,6 +48,7 @@ public class TranslateClient {
             "ZH"
     );
     public static final Set<String> SUPPORTED_TARGET_LANGUAGES = Set.of(
+            "AR",
             "BG",
             "CS",
             "DA",
