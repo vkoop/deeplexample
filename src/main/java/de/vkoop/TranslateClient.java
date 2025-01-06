@@ -16,6 +16,7 @@ import java.util.Set;
 public class TranslateClient {
 
     public static final Set<String> SUPPORTED_SOURCE_LANGUAGES = Set.of(
+            "AR",
             "BG",
             "CS",
             "DA",
