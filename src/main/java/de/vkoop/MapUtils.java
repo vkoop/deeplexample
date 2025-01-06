@@ -14,15 +14,17 @@ public class MapUtils {
 
     public static void setMapValue(Map<String, Object> map, List<String> keyList, String value) {
         if (keyList.isEmpty()) {
-            //Do nothing...
-        } else if (keyList.size() == 1) {
-            map.put(keyList.get(0), value);
+            return;
+        }
+
+        String firstElement = keyList.get(0);
+        if (keyList.size() == 1) {
+            map.put(firstElement, value);
         } else {
-            final String key = keyList.get(0);
-            map.computeIfAbsent(key, theKey -> new HashMap<>());
+            map.computeIfAbsent(firstElement, theKey -> new HashMap<>());
 
             final List<String> keyList1 = keyList.subList(1, keyList.size());
-            setMapValue((Map<String, Object>) map.get(key), keyList1, value);
+            setMapValue((Map<String, Object>) map.get(firstElement), keyList1, value);
         }
     }
 
