@@ -17,7 +17,7 @@ public class MapUtils {
             return;
         }
 
-        String firstElement = keyList.get(0);
+        String firstElement = keyList.getFirst();
         if (keyList.size() == 1) {
             map.put(firstElement, value);
         } else {
