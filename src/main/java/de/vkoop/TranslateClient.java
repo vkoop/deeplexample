@@ -80,7 +80,9 @@ public class TranslateClient {
             "SV",
             "TR",
             "UK",
-            "ZH"
+            "ZH",
+            "ZH-HANS",
+            "ZH-HANT"
     );
 
 
