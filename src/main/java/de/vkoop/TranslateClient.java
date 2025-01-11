@@ -88,13 +88,12 @@ public class TranslateClient {
 
 
     private final String authKey;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
 
     public TranslateClient(String authKey) {
         this.authKey = authKey;
-        this.objectMapper = new ObjectMapper();
     }
 
     public Response translate(String text, String sourceLanguage, String targetLanguage) {
