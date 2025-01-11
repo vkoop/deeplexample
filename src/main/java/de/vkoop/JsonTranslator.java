@@ -25,13 +25,9 @@ public class JsonTranslator {
         return MapUtils.map(stringObjectMap, value -> {
             var response =  translateClient.translate(value, sourceLang, targetLang);
 
-            if(response != null && response.translations != null && !response.translations.isEmpty()){
-                return response.translations.get(0).text;
-
-            } else {
-                return "";
-            }
-
+            return response != null && response.translations != null && !response.translations.isEmpty()
+                    ? response.translations.get(0).text
+                    : "";
         });
     }
 
