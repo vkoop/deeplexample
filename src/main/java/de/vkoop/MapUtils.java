@@ -17,11 +17,11 @@ public class MapUtils {
             return;
         }
 
-        String firstElement = keyList.getFirst();
+        String firstElement = keyList.get(0);
         if (keyList.size() == 1) {
             map.put(firstElement, value);
         } else {
-            map.computeIfAbsent(firstElement, theKey -> new HashMap<>());
+            map.computeIfAbsent(firstElement, _ -> new HashMap<>());
 
             final List<String> keyList1 = keyList.subList(1, keyList.size());
             setMapValue((Map<String, Object>) map.get(firstElement), keyList1, value);
