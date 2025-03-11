@@ -4,7 +4,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(
-    subcommands = {TranslationTask.class, ConfigGeneratorTask.class},
+    subcommands = {TranslateCommand.class, ConfigGeneratorTask.class},
     name = "deeplclient",
     description = "DeepL translation client"
 )
