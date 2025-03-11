@@ -15,7 +15,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-@Command
+@Command(
+    name = "translate",
+    description = "Translate text or JSON files using DeepL API"
+)
 public class TranslationTask implements Runnable {
 
     @Option(names = "-c")

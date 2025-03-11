@@ -53,6 +53,46 @@ Then run with:
 ./gradlew run --args="-f"
 ```
 
+### Configuration File Generator
+
+To generate a `.transcli.properties` file interactively, use the generate-config command:
+
+```bash
+# On Unix-like systems
+./bin/deeplclient generate-config
+
+# On Windows
+.\bin\deeplclient.bat generate-config
+```
+
+The generator will:
+1. Ask for your DeepL API key (required)
+2. Ask for default source language (optional)
+3. Ask for default target languages (optional)
+
+Example interaction:
+```
+DeepL Translations CLI Configuration Generator
+-------------------------------------------
+This will create a configuration file at: /home/user/.transcli.properties
+Press Enter to skip optional fields.
+
+Enter your DeepL API key (required): your-api-key-here
+Enter default source language (optional, e.g., DE): DE
+Enter default target languages (optional, comma-separated, e.g., EN,FR): EN,FR
+
+Configuration file created successfully at: /home/user/.transcli.properties
+
+Content:
+----------------------------------------
+authKey=your-api-key-here
+sourceLanguage=DE
+targetLanguages=EN,FR
+----------------------------------------
+
+You can now use the CLI with the -f flag to use this configuration.
+```
+
 ## Command Line Options
 
 - `-k`: DeepL API key
@@ -62,7 +102,7 @@ Then run with:
 - `--json-file`: Input JSON file path
 - `--json-target-file`: Output JSON file path
 - `--output-folder`: Output folder for translations
-- `-f`: Load configuration from ~/.transcli.properties
+- `-f`: Load configuration from ~/transcli.properties
 - `-c`: Specify custom configuration file path
 
 ## Supported Languages
@@ -138,11 +178,4 @@ The distribution package contains:
 ./gradlew test
 ```
 
-## License
-
-[Add your license information here]
-
-## Contributing
-
-[Add contribution guidelines here]
 
