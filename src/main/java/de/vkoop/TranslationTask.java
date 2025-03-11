@@ -66,50 +66,62 @@ public class TranslationTask implements Runnable {
         }
 
         if (jsonFile == null) {
-            var translatedCsvLine = targetLanguages.stream()
-                    .parallel()
-                    .map(targetLanguage -> getTranslateClient().translate(text.get(), sourceLanguage, targetLanguage))
-                    .filter(Objects::nonNull)
-                    .map(response -> response.translations)
-                    .map(translations -> translations.isEmpty() ? "" : translations.get(0).text)
-                    .map(translation -> "\"" + translation + "\"")
-                    .collect(Collectors.joining(";"));
-
-            System.out.println(translatedCsvLine);
+            translateTextInput();
         } else {
-            JsonTranslator jsonParser = new JsonTranslator(getTranslateClient());
-
-            targetLanguages.stream().parallel()
-                    .forEach(targetLanguage -> {
-                        try {
-                            final Map<String, Object> stringObjectMap = jsonParser.translateJsonFile(jsonFile, sourceLanguage, targetLanguage);
-                            final ObjectMapper objectMapper = new ObjectMapper();
-                            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-
-                            final File resultFile;
-                            // if parent folder is defined create the file in the parentfolder
-                            String targetLanguageLowerCase = targetLanguage.toLowerCase().replace('-', '_');
-                            if (outputFolder.isPresent() && jsonTargetFile == null) {
-                                final File parentFolder = new File(outputFolder.get());
-                                if (!parentFolder.exists()) {
-                                    parentFolder.mkdirs();
-                                }
-
-                                resultFile = new File(parentFolder, targetLanguageLowerCase + ".json");
-                            } else {
-                                resultFile = new File(Objects.requireNonNullElseGet(jsonTargetFile, () -> targetLanguageLowerCase + ".json"));
-                            }
-
-                            resultFile.createNewFile();
-                            objectMapper
-                                    .writerWithDefaultPrettyPrinter()
-                                    .writeValue(resultFile, stringObjectMap);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
+            translateJsonFile();
         }
+    }
+
+    private void translateJsonFile() {
+        JsonTranslator jsonParser = new JsonTranslator(getTranslateClient());
+
+        targetLanguages.stream().parallel()
+                .forEach(targetLanguage -> {
+                    try {
+                        final Map<String, Object> stringObjectMap = jsonParser.translateJsonFile(jsonFile, sourceLanguage, targetLanguage);
+                        final ObjectMapper objectMapper = new ObjectMapper();
+                        objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+
+                        final File resultFile = getFile(targetLanguage);
+                        objectMapper
+                                .writerWithDefaultPrettyPrinter()
+                                .writeValue(resultFile, stringObjectMap);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
+
+    private File getFile(String targetLanguage) throws IOException {
+        final File resultFile;
+        // if parent folder is defined create the file in the parentfolder
+        String targetLanguageLowerCase = targetLanguage.toLowerCase().replace('-', '_');
+        if (outputFolder.isPresent() && jsonTargetFile == null) {
+            final File parentFolder = new File(outputFolder.get());
+            if (!parentFolder.exists()) {
+                parentFolder.mkdirs();
+            }
+
+            resultFile = new File(parentFolder, targetLanguageLowerCase + ".json");
+        } else {
+            resultFile = new File(Objects.requireNonNullElseGet(jsonTargetFile, () -> targetLanguageLowerCase + ".json"));
+        }
+
+        resultFile.createNewFile();
+        return resultFile;
+    }
+
+    private void translateTextInput() {
+        var translatedCsvLine = targetLanguages.stream()
+                .parallel()
+                .map(targetLanguage -> getTranslateClient().translate(text.get(), sourceLanguage, targetLanguage))
+                .filter(Objects::nonNull)
+                .map(response -> response.translations)
+                .map(translations -> translations.isEmpty() ? "" : translations.get(0).text)
+                .map(translation -> "\"" + translation + "\"")
+                .collect(Collectors.joining(";"));
+
+        System.out.println(translatedCsvLine);
     }
 
     private void loadConfigFromFile() {
