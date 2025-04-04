@@ -89,7 +89,7 @@ public class TranslateClient {
 
     private final String authKey;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private HttpClient httpClient;
 
 
     public TranslateClient(String authKey) {
@@ -104,7 +104,7 @@ public class TranslateClient {
                     "&target_lang=%s" +
                     "&source_lang=%s", authKey, URLEncoder.encode(text, StandardCharsets.UTF_8), targetLanguage, sourceLanguage));
 
-            var client = httpClient
+            var client = getHttpClient()
                     .send(
                             HttpRequest.newBuilder()
                                     .uri(uri)
@@ -120,5 +120,16 @@ public class TranslateClient {
             System.out.println(e);
             return null;
         }
+    }
+    
+    protected HttpClient getHttpClient() {
+        if (httpClient == null) {
+            httpClient = createHttpClient();
+        }
+        return httpClient;
+    }
+    
+    protected HttpClient createHttpClient() {
+        return HttpClient.newHttpClient();
     }
 }

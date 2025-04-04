@@ -25,15 +25,21 @@ class JsonCommand extends BaseCommand {
 
     @Option(names = "--output-folder")
     Optional<String> outputFolder;
+    
+    // Package-private for testing
+    JsonTranslator jsonTranslator;
 
     @Override
     public void run() {
         loadConfigFromFile();
         validateLanguages();
 
-        JsonTranslator jsonParser = new JsonTranslator(getTranslateClient());
+        if (jsonTranslator == null) {
+            jsonTranslator = new JsonTranslator(getTranslateClient());
+        }
+        
         targetLanguages.stream().parallel()
-                .forEach(targetLanguage -> translateSingleLanguage(jsonParser, targetLanguage));
+                .forEach(targetLanguage -> translateSingleLanguage(jsonTranslator, targetLanguage));
     }
 
     private void translateSingleLanguage(JsonTranslator jsonParser, String targetLanguage) {

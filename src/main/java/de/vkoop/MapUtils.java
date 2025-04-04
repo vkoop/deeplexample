@@ -21,7 +21,7 @@ public class MapUtils {
         if (keyList.size() == 1) {
             map.put(firstElement, value);
         } else {
-            map.computeIfAbsent(firstElement, _ -> new HashMap<>());
+            map.computeIfAbsent(firstElement, key -> new HashMap<>());
 
             final List<String> keyList1 = keyList.subList(1, keyList.size());
             setMapValue((Map<String, Object>) map.get(firstElement), keyList1, value);

@@ -10,6 +10,4 @@ import picocli.CommandLine.Command;
         JsonCommand.class
     }
 )
-public class TranslateCommand {
-
-}
+public class TranslateCommand { }

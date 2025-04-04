@@ -14,6 +14,14 @@ public class JsonTranslator {
     public JsonTranslator(TranslateClient translateClient) {
         this.translateClient = translateClient;
     }
+    
+    /**
+     * Factory method to create a JsonTranslator instance.
+     * This method is primarily used for testing to allow mocking.
+     */
+    public static JsonTranslator createInstance(TranslateClient translateClient) {
+        return new JsonTranslator(translateClient);
+    }
 
     public Map<String, Object> parseAsMap(String filePath) throws IOException {
         return objectMapper.readValue(new File(filePath), Map.class);
