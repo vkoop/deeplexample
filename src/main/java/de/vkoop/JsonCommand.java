@@ -2,7 +2,6 @@ package de.vkoop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -25,7 +24,7 @@ class JsonCommand extends BaseCommand {
 
     @Option(names = "--output-folder")
     Optional<String> outputFolder;
-    
+
     // Package-private for testing
     JsonTranslator jsonTranslator;
 
@@ -37,7 +36,7 @@ class JsonCommand extends BaseCommand {
         if (jsonTranslator == null) {
             jsonTranslator = new JsonTranslator(getTranslateClient());
         }
-        
+
         targetLanguages.stream().parallel()
                 .forEach(targetLanguage -> translateSingleLanguage(jsonTranslator, targetLanguage));
     }

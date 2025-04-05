@@ -24,8 +24,8 @@ public class ConfigGeneratorTask implements Runnable {
         File configFile = new File(System.getProperty("user.home") + File.separator + ".transcli.properties");
 
         if (configFile.exists()) {
-            String response = promptRequired("Configuration file already exists at: " + configFile.getAbsolutePath() + 
-                                          "\nDo you want to replace it? (y/N): ");
+            String response = promptRequired("Configuration file already exists at: " + configFile.getAbsolutePath() +
+                    "\nDo you want to replace it? (y/N): ");
             if (!response.toLowerCase().startsWith("y")) {
                 System.out.println("Configuration generation cancelled.");
                 return;

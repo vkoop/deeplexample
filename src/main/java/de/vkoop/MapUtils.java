@@ -35,7 +35,7 @@ public class MapUtils {
     }
 
 
-     static void traverseMapAccum(Map<String, Object> nestedMap, BiConsumer<List<String>, String> consumer, List<String> accumulatedKey) {
+    static void traverseMapAccum(Map<String, Object> nestedMap, BiConsumer<List<String>, String> consumer, List<String> accumulatedKey) {
         for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
             String key = entry.getKey();
             Object valueObject = entry.getValue();

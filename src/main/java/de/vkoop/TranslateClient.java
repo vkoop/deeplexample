@@ -121,14 +121,14 @@ public class TranslateClient {
             return null;
         }
     }
-    
+
     protected HttpClient getHttpClient() {
         if (httpClient == null) {
             httpClient = createHttpClient();
         }
         return httpClient;
     }
-    
+
     protected HttpClient createHttpClient() {
         return HttpClient.newHttpClient();
     }
