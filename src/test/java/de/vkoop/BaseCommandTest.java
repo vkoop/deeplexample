@@ -1,10 +1,7 @@
 package de.vkoop;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,9 +11,11 @@ import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class BaseCommandTest {
@@ -29,7 +28,8 @@ public class BaseCommandTest {
     Path tempDir;
 
     private TestCommand testCommand;
-    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent =
+        new ByteArrayOutputStream();
 
     @BeforeEach
     void setUp() {
@@ -38,7 +38,8 @@ public class BaseCommandTest {
     }
 
     @Test
-    void loadConfigFromFile_shouldLoadConfigFromSpecifiedFile() throws IOException {
+    void loadConfigFromFile_shouldLoadConfigFromSpecifiedFile()
+        throws IOException {
         // Arrange
         testCommand.configurationFile = createConfigFile();
 
@@ -79,19 +80,20 @@ public class BaseCommandTest {
         properties.setProperty("authKey", AUTH_KEY);
         properties.setProperty("sourceLanguage", SOURCE_LANGUAGE);
         properties.setProperty("targetLanguages", TARGET_LANGUAGES);
-        
+
         try (FileOutputStream fos = new FileOutputStream(configFile)) {
             properties.store(fos, "Test Configuration");
         }
-        
+
         return configFile;
     }
 
     // Test implementation of BaseCommand
     private static class TestCommand extends BaseCommand {
+
         @Override
         public void run() {
             // Test implementation
         }
     }
-} 
+}

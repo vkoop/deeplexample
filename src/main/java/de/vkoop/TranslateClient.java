@@ -12,8 +12,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TranslateClient {
+    private static final Logger logger = LoggerFactory.getLogger(TranslateClient.class);
 
     public static final Set<String> SUPPORTED_SOURCE_LANGUAGES = Set.of(
             "AR",
@@ -102,7 +105,11 @@ public class TranslateClient {
             final URI uri = new URI(String.format("https://api-free.deepl.com/v2/translate?" +
                     "auth_key=%s&text=%s" +
                     "&target_lang=%s" +
-                    "&source_lang=%s", authKey, URLEncoder.encode(text, StandardCharsets.UTF_8), targetLanguage, sourceLanguage));
+                    "&source_lang=%s",
+                    URLEncoder.encode(authKey, StandardCharsets.UTF_8),
+                    URLEncoder.encode(text, StandardCharsets.UTF_8),
+                    URLEncoder.encode(targetLanguage, StandardCharsets.UTF_8),
+                    URLEncoder.encode(sourceLanguage, StandardCharsets.UTF_8)));
 
             var client = getHttpClient()
                     .send(
@@ -117,7 +124,10 @@ public class TranslateClient {
 
             return objectMapper.readValue(responseBody, Response.class);
         } catch (InterruptedException | URISyntaxException | IOException e) {
-            System.out.println(e);
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            logger.error("Exception during translation", e);
             return null;
         }
     }

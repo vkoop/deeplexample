@@ -3,6 +3,9 @@ plugins {
     id 'application'
 }
 
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
 group 'org.example'
 version '1.0-SNAPSHOT'
 
@@ -21,6 +24,10 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+
+    // Logging dependencies
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'
 
 
 

@@ -1,24 +1,23 @@
 package de.vkoop;
 
-import de.vkoop.data.Response;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+import de.vkoop.data.Response;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class JsonTranslatorTest {
@@ -46,7 +45,9 @@ public class JsonTranslatorTest {
         Path jsonFile = createTempJsonFile(jsonContent);
 
         // Act
-        Map<String, Object> result = jsonTranslator.parseAsMap(jsonFile.toString());
+        Map<String, Object> result = jsonTranslator.parseAsMap(
+            jsonFile.toString()
+        );
 
         // Assert
         assertEquals(2, result.size());
@@ -57,24 +58,41 @@ public class JsonTranslatorTest {
     @Test
     void translateJsonFile_shouldTranslateAllStringValues() throws IOException {
         // Arrange
-        String jsonContent = "{\"key1\":\"value1\",\"nested\":{\"key2\":\"value2\"}}";
+        String jsonContent =
+            "{\"key1\":\"value1\",\"nested\":{\"key2\":\"value2\"}}";
         Path jsonFile = createTempJsonFile(jsonContent);
 
         // Mock translate client responses
         Response response1 = createMockResponse("TRANSLATED_VALUE1");
         Response response2 = createMockResponse("TRANSLATED_VALUE2");
 
-        when(translateClient.translate(eq("value1"), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE)))
-                .thenReturn(response1);
-        when(translateClient.translate(eq("value2"), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE)))
-                .thenReturn(response2);
+        when(
+            translateClient.translate(
+                eq("value1"),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE)
+            )
+        ).thenReturn(response1);
+        when(
+            translateClient.translate(
+                eq("value2"),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE)
+            )
+        ).thenReturn(response2);
 
         // Act
-        Map<String, Object> result = jsonTranslator.translateJsonFile(jsonFile.toString(), SOURCE_LANGUAGE, TARGET_LANGUAGE);
+        Map<String, Object> result = jsonTranslator.translateJsonFile(
+            jsonFile.toString(),
+            SOURCE_LANGUAGE,
+            TARGET_LANGUAGE
+        );
 
         // Assert
         assertEquals("TRANSLATED_VALUE1", result.get("key1"));
-        Map<String, Object> nestedResult = (Map<String, Object>) result.get("nested");
+        Map<String, Object> nestedResult = (Map<String, Object>) result.get(
+            "nested"
+        );
         assertEquals("TRANSLATED_VALUE2", nestedResult.get("key2"));
     }
 
@@ -85,11 +103,20 @@ public class JsonTranslatorTest {
         Path jsonFile = createTempJsonFile(jsonContent);
 
         // Mock translate client to return null
-        when(translateClient.translate(anyString(), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE)))
-                .thenReturn(null);
+        when(
+            translateClient.translate(
+                anyString(),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE)
+            )
+        ).thenReturn(null);
 
         // Act
-        Map<String, Object> result = jsonTranslator.translateJsonFile(jsonFile.toString(), SOURCE_LANGUAGE, TARGET_LANGUAGE);
+        Map<String, Object> result = jsonTranslator.translateJsonFile(
+            jsonFile.toString(),
+            SOURCE_LANGUAGE,
+            TARGET_LANGUAGE
+        );
 
         // Assert
         assertEquals("", result.get("key1"));
@@ -108,4 +135,4 @@ public class JsonTranslatorTest {
         response.translations = Collections.singletonList(translation);
         return response;
     }
-} 
+}

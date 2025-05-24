@@ -1,6 +1,8 @@
 package de.vkoop;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class MapUtilsTest {
 
@@ -37,7 +36,9 @@ public class MapUtilsTest {
         Map<String, Object> level1Map = (Map<String, Object>) map.get("level1");
         assertTrue(level1Map.containsKey("level2"));
 
-        Map<String, Object> level2Map = (Map<String, Object>) level1Map.get("level2");
+        Map<String, Object> level2Map = (Map<String, Object>) level1Map.get(
+            "level2"
+        );
         assertEquals("deepValue", level2Map.get("level3"));
     }
 
@@ -49,7 +50,10 @@ public class MapUtilsTest {
 
         MapUtils.setMapValue(map, keys, value);
 
-        assertTrue(map.isEmpty(), "Map should remain empty when key list is empty");
+        assertTrue(
+            map.isEmpty(),
+            "Map should remain empty when key list is empty"
+        );
     }
 
     @Test
@@ -73,7 +77,11 @@ public class MapUtilsTest {
         map.put("key2", "value2");
 
         List<String> result = new ArrayList<>();
-        MapUtils.traverseMapAccum(map, (keys, value) -> result.add(String.join(".", keys) + "=" + value), List.of());
+        MapUtils.traverseMapAccum(
+            map,
+            (keys, value) -> result.add(String.join(".", keys) + "=" + value),
+            List.of()
+        );
 
         assertTrue(result.contains("key1=value1"));
         assertTrue(result.contains("key2=value2"));
@@ -87,7 +95,11 @@ public class MapUtilsTest {
         map.put("key1", nestedMap);
 
         List<String> result = new ArrayList<>();
-        MapUtils.traverseMapAccum(map, (keys, value) -> result.add(String.join(".", keys) + "=" + value), List.of());
+        MapUtils.traverseMapAccum(
+            map,
+            (keys, value) -> result.add(String.join(".", keys) + "=" + value),
+            List.of()
+        );
 
         assertTrue(result.contains("key1.key2=value2"));
     }
@@ -97,7 +109,11 @@ public class MapUtilsTest {
         Map<String, Object> map = new HashMap<>();
 
         List<String> result = new ArrayList<>();
-        MapUtils.traverseMapAccum(map, (keys, value) -> result.add(String.join(".", keys) + "=" + value), List.of());
+        MapUtils.traverseMapAccum(
+            map,
+            (keys, value) -> result.add(String.join(".", keys) + "=" + value),
+            List.of()
+        );
 
         assertTrue(result.isEmpty());
     }
@@ -111,12 +127,15 @@ public class MapUtilsTest {
         map.put("key2", nestedMap);
 
         List<String> result = new ArrayList<>();
-        MapUtils.traverseMapAccum(map, (keys, value) -> result.add(String.join(".", keys) + "=" + value), List.of());
+        MapUtils.traverseMapAccum(
+            map,
+            (keys, value) -> result.add(String.join(".", keys) + "=" + value),
+            List.of()
+        );
 
         assertTrue(result.contains("key1=value1"));
         assertTrue(result.contains("key2.key3=value3"));
     }
-
 
     @Test
     public void map_SingleLevelMap() {
@@ -139,7 +158,9 @@ public class MapUtilsTest {
 
         Map<String, Object> result = MapUtils.map(map, String::toUpperCase);
 
-        Map<String, Object> resultNestedMap = (Map<String, Object>) result.get("key1");
+        Map<String, Object> resultNestedMap = (Map<String, Object>) result.get(
+            "key1"
+        );
         assertEquals("VALUE2", resultNestedMap.get("key2"));
     }
 
@@ -163,7 +184,9 @@ public class MapUtilsTest {
         Map<String, Object> result = MapUtils.map(map, String::toUpperCase);
 
         assertEquals("VALUE1", result.get("key1"));
-        Map<String, Object> resultNestedMap = (Map<String, Object>) result.get("key2");
+        Map<String, Object> resultNestedMap = (Map<String, Object>) result.get(
+            "key2"
+        );
         assertEquals("VALUE3", resultNestedMap.get("key3"));
     }
 

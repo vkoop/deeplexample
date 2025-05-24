@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 abstract class BaseCommand implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(BaseCommand.class);
     @CommandLine.Option(names = "-c")
     File configurationFile;
 
@@ -29,13 +32,13 @@ abstract class BaseCommand implements Runnable {
 
     protected void validateLanguages() {
         if (!TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains(sourceLanguage)) {
-            System.err.println("Unsupported source language: " + sourceLanguage);
+            logger.error("Unsupported source language: {}", sourceLanguage);
             System.exit(1);
         }
 
         for (String targetLanguage : targetLanguages) {
             if (!TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains(targetLanguage)) {
-                System.err.println("Unsupported target language: " + targetLanguage);
+                logger.error("Unsupported target language: {}", targetLanguage);
                 System.exit(1);
             }
         }
@@ -43,7 +46,7 @@ abstract class BaseCommand implements Runnable {
 
     protected void loadConfigFromFile() {
         if (authKey == null && configurationFile == null && !loadConfigFromHome) {
-            System.err.println("No authentication provided will exit.");
+            logger.error("No authentication provided will exit.");
             System.exit(1);
         } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
@@ -60,7 +63,7 @@ abstract class BaseCommand implements Runnable {
                         .map(value -> List.of(value.split(",")))
                         .ifPresent(value -> this.targetLanguages = value);
             } catch (IOException e) {
-                System.err.println("Failed to load file: " + configurationFile);
+                logger.error("Failed to load file: {}", configurationFile);
                 System.exit(1);
             }
         }

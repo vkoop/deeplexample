@@ -9,14 +9,18 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Command(name = "generate-config", description = "Generate .transcli.properties configuration file")
 public class ConfigGeneratorTask implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(ConfigGeneratorTask.class);
     private final Console console = System.console();
 
     @Override
     public void run() {
         if (console == null) {
-            System.err.println("No console available. Please run this command in a terminal.");
+            logger.error("No console available. Please run this command in a terminal.");
             System.exit(1);
         }
 
@@ -27,15 +31,15 @@ public class ConfigGeneratorTask implements Runnable {
             String response = promptRequired("Configuration file already exists at: " + configFile.getAbsolutePath() +
                     "\nDo you want to replace it? (y/N): ");
             if (!response.toLowerCase().startsWith("y")) {
-                System.out.println("Configuration generation cancelled.");
+                logger.info("Configuration generation cancelled.");
                 return;
             }
         }
 
-        System.out.println("DeepL Translations CLI Configuration Generator");
-        System.out.println("-------------------------------------------");
-        System.out.println("This will create a configuration file at: " + configFile.getAbsolutePath());
-        System.out.println("Press Enter to skip optional fields.\n");
+        logger.info("DeepL Translations CLI Configuration Generator");
+        logger.info("-------------------------------------------");
+        logger.info("This will create a configuration file at: {}", configFile.getAbsolutePath());
+        logger.info("Press Enter to skip optional fields.");
 
         // Required: API Key
         String authKey = promptRequired("Enter your DeepL API key (required): ");
@@ -55,14 +59,14 @@ public class ConfigGeneratorTask implements Runnable {
 
         try (FileOutputStream out = new FileOutputStream(configFile)) {
             properties.store(out, "DeepL Translations CLI Configuration - Generated on " + LocalDateTime.now());
-            System.out.println("\nConfiguration file created successfully at: " + configFile.getAbsolutePath());
-            System.out.println("\nContent:");
-            System.out.println("----------------------------------------");
-            properties.forEach((key, value) -> System.out.println(key + "=" + value));
-            System.out.println("----------------------------------------");
-            System.out.println("\nYou can now use the CLI with the -f flag to use this configuration.");
+            logger.info("Configuration file created successfully at: {}", configFile.getAbsolutePath());
+            logger.info("Content:");
+            logger.info("----------------------------------------");
+            properties.forEach((key, value) -> logger.info("{}={}", key, value));
+            logger.info("----------------------------------------");
+            logger.info("You can now use the CLI with the -f flag to use this configuration.");
         } catch (IOException e) {
-            System.err.println("Failed to create configuration file: " + e.getMessage());
+            logger.error("Failed to create configuration file: {}", e.getMessage(), e);
             System.exit(1);
         }
     }
@@ -72,7 +76,7 @@ public class ConfigGeneratorTask implements Runnable {
         do {
             input = console.readLine(prompt).trim();
             if (input.isEmpty()) {
-                System.out.println("This field is required. Please try again.");
+                logger.warn("This field is required. Please try again.");
             }
         } while (input.isEmpty());
         return input;

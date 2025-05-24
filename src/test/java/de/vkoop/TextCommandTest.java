@@ -1,24 +1,23 @@
 package de.vkoop;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import de.vkoop.data.Response;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TextCommandTest {
@@ -34,7 +33,8 @@ public class TextCommandTest {
     private TranslateClient translateClient;
 
     private TextCommand textCommand;
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outContent =
+        new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
 
     @BeforeEach
@@ -59,42 +59,65 @@ public class TextCommandTest {
     @Test
     void run_shouldTranslateTextToSingleLanguage() {
         // Arrange
-        textCommand.targetLanguages = Collections.singletonList(TARGET_LANGUAGE_1);
-        
+        textCommand.targetLanguages = Collections.singletonList(
+            TARGET_LANGUAGE_1
+        );
+
         Response response = new Response();
         Response.Translation translation = new Response.Translation();
         translation.text = TRANSLATED_TEXT_1;
         response.translations = Collections.singletonList(translation);
-        
-        when(translateClient.translate(eq(TEXT_TO_TRANSLATE), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE_1)))
-                .thenReturn(response);
+
+        when(
+            translateClient.translate(
+                eq(TEXT_TO_TRANSLATE),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE_1)
+            )
+        ).thenReturn(response);
 
         // Act
         textCommand.run();
 
         // Assert
-        assertEquals("\"" + TRANSLATED_TEXT_1 + "\"", outContent.toString().trim());
+        assertEquals(
+            "\"" + TRANSLATED_TEXT_1 + "\"",
+            outContent.toString().trim()
+        );
     }
 
     @Test
     void run_shouldTranslateTextToMultipleLanguages() {
         // Arrange
-        textCommand.targetLanguages = Arrays.asList(TARGET_LANGUAGE_1, TARGET_LANGUAGE_2);
-        
+        textCommand.targetLanguages = Arrays.asList(
+            TARGET_LANGUAGE_1,
+            TARGET_LANGUAGE_2
+        );
+
         Response response1 = new Response();
         Response.Translation translation1 = new Response.Translation();
         translation1.text = TRANSLATED_TEXT_1;
         response1.translations = Collections.singletonList(translation1);
-        
+
         Response response2 = new Response();
         Response.Translation translation2 = new Response.Translation();
         translation2.text = TRANSLATED_TEXT_2;
         response2.translations = Collections.singletonList(translation2);
-        
-        when(translateClient.translate(eq(TEXT_TO_TRANSLATE), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE_1)))
-                .thenReturn(response1);
-        when(translateClient.translate(eq(TEXT_TO_TRANSLATE), eq(SOURCE_LANGUAGE), eq(TARGET_LANGUAGE_2)))
-                .thenReturn(response2);
+
+        when(
+            translateClient.translate(
+                eq(TEXT_TO_TRANSLATE),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE_1)
+            )
+        ).thenReturn(response1);
+        when(
+            translateClient.translate(
+                eq(TEXT_TO_TRANSLATE),
+                eq(SOURCE_LANGUAGE),
+                eq(TARGET_LANGUAGE_2)
+            )
+        ).thenReturn(response2);
 
         // Act
         textCommand.run();
@@ -109,10 +132,13 @@ public class TextCommandTest {
     @Test
     void run_shouldHandleNullResponse() {
         // Arrange
-        textCommand.targetLanguages = Collections.singletonList(TARGET_LANGUAGE_1);
-        
-        when(translateClient.translate(anyString(), anyString(), anyString()))
-                .thenReturn(null);
+        textCommand.targetLanguages = Collections.singletonList(
+            TARGET_LANGUAGE_1
+        );
+
+        when(
+            translateClient.translate(anyString(), anyString(), anyString())
+        ).thenReturn(null);
 
         // Act
         textCommand.run();
@@ -124,13 +150,16 @@ public class TextCommandTest {
     @Test
     void run_shouldHandleEmptyTranslations() {
         // Arrange
-        textCommand.targetLanguages = Collections.singletonList(TARGET_LANGUAGE_1);
-        
+        textCommand.targetLanguages = Collections.singletonList(
+            TARGET_LANGUAGE_1
+        );
+
         Response response = new Response();
         response.translations = Collections.emptyList();
-        
-        when(translateClient.translate(anyString(), anyString(), anyString()))
-                .thenReturn(response);
+
+        when(
+            translateClient.translate(anyString(), anyString(), anyString())
+        ).thenReturn(response);
 
         // Act
         textCommand.run();
@@ -138,4 +167,4 @@ public class TextCommandTest {
         // Assert
         assertEquals("\"\"", outContent.toString().trim());
     }
-} 
+}

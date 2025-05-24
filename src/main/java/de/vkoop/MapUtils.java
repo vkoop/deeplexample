@@ -47,7 +47,7 @@ public class MapUtils {
             if (valueObject instanceof String valueString) {
                 consumer.accept(accumulatedKeyList, valueString);
             } else if (valueObject instanceof Map) {
-                traverseMapAccum((Map<String, Object>) nestedMap.get(key), consumer, accumulatedKeyList);
+                traverseMapAccum((Map<String, Object>) valueObject, consumer, accumulatedKeyList);
             }
         }
     }
