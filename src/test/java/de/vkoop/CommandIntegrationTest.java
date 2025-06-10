@@ -1,5 +1,7 @@
 package de.vkoop;
 
+import de.vkoop.commands.JsonCommand;
+import de.vkoop.commands.TextCommand;
 import de.vkoop.interfaces.TranslateClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,6 +139,9 @@ public class CommandIntegrationTest {
         );
         jsonCommand.jsonFile = jsonFile.toString();
         jsonCommand.outputFolder = java.util.Optional.of(outputDir.toString());
+        
+        // Manually set the JsonTranslator since we're not using Spring context in tests
+        jsonCommand.jsonTranslator = new JsonTranslator(translateClient);
 
         // Act
         jsonCommand.run();

@@ -1,4 +1,4 @@
-package de.vkoop;
+package de.vkoop.commands;
 
 import de.vkoop.interfaces.TranslateClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,17 +90,7 @@ public class BaseCommandTest {
         testCommand.validateLanguages();
     }
 
-    @Test
-    void getTranslateClient_shouldCreateClientWithAuthKey() {
-        // Arrange
-        testCommand.authKey = AUTH_KEY;
 
-        // Act
-        TranslateClient client = testCommand.getTranslateClient();
-
-        // Assert
-        assertNotNull(client);
-    }
 
     private File createConfigFile() throws IOException {
         File configFile = tempDir.resolve("config.properties").toFile();

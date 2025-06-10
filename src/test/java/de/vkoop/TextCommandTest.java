@@ -1,5 +1,6 @@
 package de.vkoop;
 
+import de.vkoop.commands.TextCommand;
 import de.vkoop.data.Response;
 import de.vkoop.interfaces.TranslateClient;
 import org.junit.jupiter.api.AfterEach;

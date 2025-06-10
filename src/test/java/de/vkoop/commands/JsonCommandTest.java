@@ -1,6 +1,7 @@
-package de.vkoop;
+package de.vkoop.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.vkoop.JsonTranslator;
 import de.vkoop.interfaces.TranslateClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

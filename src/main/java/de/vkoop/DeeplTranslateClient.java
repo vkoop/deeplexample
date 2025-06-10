@@ -7,6 +7,7 @@ import de.vkoop.data.Response;
 import de.vkoop.interfaces.TranslateClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+@Component
 public class DeeplTranslateClient implements TranslateClient {
     private static final Logger logger = LoggerFactory.getLogger(DeeplTranslateClient.class);
 
@@ -96,12 +98,11 @@ public class DeeplTranslateClient implements TranslateClient {
     );
 
 
-    private final String authKey;
+    private String authKey;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private HttpClient httpClient;
 
-    public DeeplTranslateClient(String authKey) {
-        this.authKey = authKey;
+    public DeeplTranslateClient() {
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -175,5 +176,9 @@ public class DeeplTranslateClient implements TranslateClient {
 
     protected HttpClient createHttpClient() {
         return HttpClient.newHttpClient();
+    }
+
+    public void setAuthKey(String authKey) {
+        this.authKey = authKey;
     }
 }
