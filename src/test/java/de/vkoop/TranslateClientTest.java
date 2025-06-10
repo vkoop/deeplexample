@@ -1,22 +1,26 @@
 package de.vkoop;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import de.vkoop.data.Response;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TranslateClientTest {
@@ -33,12 +37,12 @@ public class TranslateClientTest {
     @Mock
     private HttpResponse<String> httpResponse;
 
-    private TranslateClient translateClient;
+    private DeeplTranslateClient translateClient;
 
     @BeforeEach
     void setUp() throws Exception {
         // Create a test instance with the mocked HttpClient
-        translateClient = new TranslateClient(AUTH_KEY) {
+        translateClient = new DeeplTranslateClient(AUTH_KEY) {
             @Override
             protected HttpClient createHttpClient() {
                 return httpClient;
@@ -52,6 +56,8 @@ public class TranslateClientTest {
         String jsonResponse =
             "{\"translations\":[{\"detected_source_language\":\"DE\",\"text\":\"Hello World\"}]}";
         when(httpResponse.body()).thenReturn(jsonResponse);
+        // Mock the status code to return 200 (Success)
+        when(httpResponse.statusCode()).thenReturn(200);
         when(
             httpClient.send(
                 any(HttpRequest.class),
@@ -84,6 +90,10 @@ public class TranslateClientTest {
         assertTrue(uri.toString().contains("target_lang=" + TARGET_LANGUAGE));
         assertTrue(uri.toString().contains("text=Hallo+Welt"));
 
+        // Verify response is not null before accessing its properties
+        assertTrue(response != null, "Response should not be null");
+        assertTrue(response.translations != null, "Response translations should not be null");
+        assertTrue(!response.translations.isEmpty(), "Response translations should not be empty");
         assertEquals(TRANSLATED_TEXT, response.translations.get(0).text);
         assertEquals(
             SOURCE_LANGUAGE,
@@ -115,22 +125,22 @@ public class TranslateClientTest {
     @Test
     void translate_shouldValidateSourceLanguage() {
         // Act & Assert
-        assertTrue(TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains("DE"));
-        assertTrue(TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains("EN"));
-        assertTrue(TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains("FR"));
-        assertFalse(TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains("XX"));
+        assertTrue(translateClient.getSupportedSourceLanguages().contains("DE"));
+        assertTrue(translateClient.getSupportedSourceLanguages().contains("EN"));
+        assertTrue(translateClient.getSupportedSourceLanguages().contains("FR"));
+        assertFalse(translateClient.getSupportedSourceLanguages().contains("XX"));
     }
 
     @Test
     void translate_shouldValidateTargetLanguage() {
         // Act & Assert
-        assertTrue(TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains("DE"));
+        assertTrue(translateClient.getSupportedTargetLanguages().contains("DE"));
         assertTrue(
-            TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains("EN-US")
+            translateClient.getSupportedTargetLanguages().contains("EN-US")
         );
         assertTrue(
-            TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains("ZH-HANS")
+            translateClient.getSupportedTargetLanguages().contains("ZH-HANS")
         );
-        assertFalse(TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains("XX"));
+        assertFalse(translateClient.getSupportedTargetLanguages().contains("XX"));
     }
 }

@@ -1,9 +1,10 @@
 package de.vkoop;
 
-import java.util.Objects;
-import java.util.stream.Collectors;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Command(name = "text", description = "Translate text using DeepL API")
 class TextCommand extends BaseCommand {

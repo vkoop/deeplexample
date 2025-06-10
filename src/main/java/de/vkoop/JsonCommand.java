@@ -2,13 +2,14 @@ package de.vkoop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
 @Command(name = "json", description = "Translate JSON files using DeepL API")
 class JsonCommand extends BaseCommand {

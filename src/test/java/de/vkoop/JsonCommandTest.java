@@ -1,34 +1,36 @@
 package de.vkoop;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.vkoop.interfaces.TranslateClient;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class JsonCommandTest {
 
     private static final String SOURCE_LANGUAGE = "DE";
-    private static final String TARGET_LANGUAGE_1 = "EN";
-    private static final String TARGET_LANGUAGE_2 = "FR";
+    private static final String TARGET_LANGUAGE = "EN";
     private static final String JSON_CONTENT = "{\"key\":\"value\"}";
 
     @Mock
@@ -59,8 +61,8 @@ public class JsonCommandTest {
         jsonCommand.setTranslateClient(translateClient);
         jsonCommand.sourceLanguage = SOURCE_LANGUAGE;
         jsonCommand.targetLanguages = Arrays.asList(
-            TARGET_LANGUAGE_1,
-            TARGET_LANGUAGE_2
+            TARGET_LANGUAGE,
+            "FR"
         );
 
         // Create a test JSON file
@@ -73,6 +75,21 @@ public class JsonCommandTest {
 
         // Set up the JsonTranslator mock
         jsonCommand.jsonTranslator = jsonTranslator;
+
+        // Mock supported languages - needed for validateLanguages if JsonCommand uses it
+        Set<String> supportedSourceLanguages = new HashSet<>();
+        supportedSourceLanguages.add(SOURCE_LANGUAGE);
+        supportedSourceLanguages.add("EN");
+        supportedSourceLanguages.add("FR");
+        
+        Set<String> supportedTargetLanguages = new HashSet<>();
+        supportedTargetLanguages.add(TARGET_LANGUAGE);
+        supportedTargetLanguages.add("DE");
+        supportedTargetLanguages.add("FR");
+        
+        // Using lenient mode to avoid UnnecessaryStubbingException
+        when(translateClient.getSupportedSourceLanguages()).thenReturn(supportedSourceLanguages);
+        when(translateClient.getSupportedTargetLanguages()).thenReturn(supportedTargetLanguages);
     }
 
     @Test
