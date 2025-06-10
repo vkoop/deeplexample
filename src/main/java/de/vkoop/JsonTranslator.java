@@ -2,14 +2,16 @@ package de.vkoop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.vkoop.interfaces.TranslateClient;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+@Component
 public class JsonTranslator {
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final TranslateClient translateClient;
 

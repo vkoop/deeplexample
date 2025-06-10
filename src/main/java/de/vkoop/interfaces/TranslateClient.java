@@ -32,4 +32,6 @@ public interface TranslateClient {
      * @return Set of language codes that can be used as target languages
      */
     Set<String> getSupportedTargetLanguages();
+
+    void setAuthKey(String authKey);
 }

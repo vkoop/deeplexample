@@ -27,16 +27,16 @@ A command-line tool for translating text and JSON files using the DeepL API.
 ## Quick Start
 
 1. Build the project: `./gradlew build`
-2. Generate a config file: `./gradlew run --args="generate-config"`
+2. Generate a config file: `./gradlew bootRun --args="generate-config"`
 3. Run a translation:
    ```
-   ./gradlew run --args="translate text --text 'Hello world' -f"
+   ./gradlew bootRun --args="translate text --text 'Hello world' -f"
    ```
 
 For complete usage instructions:
 ```
-./gradlew run --args="--help"
-./gradlew run --args="translate --help"
+./gradlew bootRun --args="--help"
+./gradlew bootRun --args="translate --help"
 ```
 
 ## Distribution

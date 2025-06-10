@@ -1,7 +1,10 @@
-package de.vkoop;
+package de.vkoop.commands;
 
+
+import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
+@Component
 @Command(
     name = "translate",
     description = "Translation commands using DeepL API",

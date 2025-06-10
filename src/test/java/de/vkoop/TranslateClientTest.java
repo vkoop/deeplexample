@@ -42,12 +42,14 @@ public class TranslateClientTest {
     @BeforeEach
     void setUp() throws Exception {
         // Create a test instance with the mocked HttpClient
-        translateClient = new DeeplTranslateClient(AUTH_KEY) {
+        translateClient = new DeeplTranslateClient() {
             @Override
             protected HttpClient createHttpClient() {
                 return httpClient;
             }
         };
+
+        translateClient.setAuthKey(AUTH_KEY);
     }
 
     @Test

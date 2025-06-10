@@ -1,8 +1,9 @@
-package de.vkoop;
+package de.vkoop.commands;
 
 import de.vkoop.interfaces.TranslateClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -12,34 +13,35 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-abstract class BaseCommand implements Runnable {
+public abstract class BaseCommand implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(BaseCommand.class);
     
     @CommandLine.Option(names = "-c")
-    File configurationFile;
+    public File configurationFile;
 
     @CommandLine.Option(names = "-f", description = "load configuration from home. E.g. ~/.transcli.properties")
-    boolean loadConfigFromHome;
+    public boolean loadConfigFromHome;
 
     @CommandLine.Option(names = "-k")
-    String authKey;
+    public String authKey;
 
     @CommandLine.Option(names = "-s")
-    String sourceLanguage;
+    public String sourceLanguage;
 
     @CommandLine.Option(names = "-t", split = ",")
-    List<String> targetLanguages;
+    public List<String> targetLanguages;
 
-    private TranslateClient translateClient;
+    @Autowired
+    protected TranslateClient translateClient;
 
     protected void validateLanguages() {
-        if (!getTranslateClient().getSupportedSourceLanguages().contains(sourceLanguage)) {
+        if (!translateClient.getSupportedSourceLanguages().contains(sourceLanguage)) {
             logger.error("Unsupported source language: {}", sourceLanguage);
             System.exit(1);
         }
 
         for (String targetLanguage : targetLanguages) {
-            if (!getTranslateClient().getSupportedTargetLanguages().contains(targetLanguage)) {
+            if (!translateClient.getSupportedTargetLanguages().contains(targetLanguage)) {
                 logger.error("Unsupported target language: {}", targetLanguage);
                 System.exit(1);
             }
@@ -64,6 +66,8 @@ abstract class BaseCommand implements Runnable {
                 Optional.ofNullable(properties.getProperty("targetLanguages"))
                         .map(value -> List.of(value.split(",")))
                         .ifPresent(value -> this.targetLanguages = value);
+
+                translateClient.setAuthKey(this.authKey);
             } catch (IOException e) {
                 logger.error("Failed to load file: {}", configurationFile);
                 System.exit(1);
@@ -71,12 +75,7 @@ abstract class BaseCommand implements Runnable {
         }
     }
 
-    protected TranslateClient getTranslateClient() {
-        if (null == translateClient) {
-            translateClient = new DeeplTranslateClient(authKey);
-        }
-        return translateClient;
-    }
+
 
     public void setTranslateClient(TranslateClient translateClient) {
         this.translateClient = translateClient;

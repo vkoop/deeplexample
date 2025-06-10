@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '3.5.0'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 sourceCompatibility = '17'
@@ -19,27 +21,21 @@ application {
 }
 
 dependencies {
+    // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // Picocli dependencies
     implementation "info.picocli:picocli:$picoliVersion"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'info.picocli:picocli-spring-boot-starter:4.7.7'
     annotationProcessor "info.picocli:picocli-codegen:$picoliVersion"
 
+    // Jackson dependencies
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
 
-    // Logging dependencies
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'
 
-
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:' + junitVersion
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:' + junitVersion
-
-    // https://mvnrepository.com/artifact/org.mockito/mockito-core
-
-
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-// https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockitoVersion
 }
 
 compileJava {
