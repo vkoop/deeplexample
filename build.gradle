@@ -36,7 +36,15 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
 
 
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
 }
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:1.0.0"
+    }
+}
+
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]

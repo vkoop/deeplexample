@@ -1,4 +1,4 @@
-package de.vkoop;
+package de.vkoop.clients;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
