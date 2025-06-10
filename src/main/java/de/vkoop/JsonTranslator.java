@@ -1,6 +1,8 @@
 package de.vkoop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.vkoop.interfaces.TranslateClient;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;

@@ -1,10 +1,13 @@
 package de.vkoop;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import de.vkoop.interfaces.TranslateClient;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,14 +16,13 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import picocli.CommandLine;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CommandIntegrationTest {
@@ -44,6 +46,16 @@ public class CommandIntegrationTest {
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outContent));
+        
+        // Mock the supported languages
+        Set<String> supportedSourceLanguages = new HashSet<>();
+        supportedSourceLanguages.add(SOURCE_LANGUAGE);
+        
+        Set<String> supportedTargetLanguages = new HashSet<>();
+        supportedTargetLanguages.add(TARGET_LANGUAGE);
+        
+        when(translateClient.getSupportedSourceLanguages()).thenReturn(supportedSourceLanguages);
+        when(translateClient.getSupportedTargetLanguages()).thenReturn(supportedTargetLanguages);
     }
 
     @AfterEach

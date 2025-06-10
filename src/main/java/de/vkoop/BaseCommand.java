@@ -1,5 +1,8 @@
 package de.vkoop;
 
+import de.vkoop.interfaces.TranslateClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -8,11 +11,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 abstract class BaseCommand implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(BaseCommand.class);
+    
     @CommandLine.Option(names = "-c")
     File configurationFile;
 
@@ -31,13 +33,13 @@ abstract class BaseCommand implements Runnable {
     private TranslateClient translateClient;
 
     protected void validateLanguages() {
-        if (!TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains(sourceLanguage)) {
+        if (!getTranslateClient().getSupportedSourceLanguages().contains(sourceLanguage)) {
             logger.error("Unsupported source language: {}", sourceLanguage);
             System.exit(1);
         }
 
         for (String targetLanguage : targetLanguages) {
-            if (!TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains(targetLanguage)) {
+            if (!getTranslateClient().getSupportedTargetLanguages().contains(targetLanguage)) {
                 logger.error("Unsupported target language: {}", targetLanguage);
                 System.exit(1);
             }
@@ -71,7 +73,7 @@ abstract class BaseCommand implements Runnable {
 
     protected TranslateClient getTranslateClient() {
         if (null == translateClient) {
-            translateClient = new TranslateClient(authKey);
+            translateClient = new DeeplTranslateClient(authKey);
         }
         return translateClient;
     }
