@@ -1,5 +1,6 @@
 package de.vkoop;
 
+import de.vkoop.clients.DeeplTranslateClient;
 import de.vkoop.data.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
