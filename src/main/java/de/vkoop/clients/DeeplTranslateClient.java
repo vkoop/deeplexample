@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
+@Component("deeplClient")
 public class DeeplTranslateClient implements TranslateClient {
     private static final Logger logger = LoggerFactory.getLogger(DeeplTranslateClient.class);
 
