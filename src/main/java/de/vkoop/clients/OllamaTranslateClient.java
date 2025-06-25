@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component
+@Component("ollamaClient")
 public class OllamaTranslateClient implements TranslateClient {
 
     private static final Logger logger = LoggerFactory.getLogger(OllamaTranslateClient.class);
@@ -47,18 +47,8 @@ public class OllamaTranslateClient implements TranslateClient {
         
         try {
             // Create system message with translation instructions
-            SystemMessage systemMessage = new SystemMessage(
-                "You are a professional translator. " +
-                "Translate the provided text from " + sourceLanguage + " to " + targetLanguage + ". " +
-                "Return ONLY the translated text without any explanations, notes, or additional content."
-            );
-            
-            // Create user message with the text to translate
-            UserMessage userMessage = new UserMessage(text);
-            
-            // Create prompt with both messages
-            Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
-            
+            Prompt prompt = getPrompt(text, sourceLanguage, targetLanguage);
+
             // Get response from Ollama
             ChatResponse chatResponse = chatModel.call(prompt);
             String translatedText = chatResponse.getResult().getOutput().getText();
@@ -95,4 +85,19 @@ public class OllamaTranslateClient implements TranslateClient {
         // Note: Ollama typically doesn't require an auth key for local instances,
         // but we implement this method to satisfy the interface
     }
+
+    private static Prompt getPrompt(String text, String sourceLanguage, String targetLanguage) {
+        SystemMessage systemMessage = new SystemMessage(
+                "You are a professional translator. " +
+                "Translate the provided text from " + sourceLanguage + " to " + targetLanguage + ". " +
+                "Return ONLY the translated text without any explanations, notes, or additional content."
+        );
+
+        // Create user message with the text to translate
+        UserMessage userMessage = new UserMessage(text);
+
+        // Create prompt with both messages
+        return new Prompt(List.of(systemMessage, userMessage));
+    }
+
 }
