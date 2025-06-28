@@ -7,6 +7,7 @@ import de.vkoop.data.Response;
 import de.vkoop.interfaces.TranslateClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+@ConditionalOnProperty(name = "translate.client", havingValue = "deepl")
 @Component("deeplClient")
 public class DeeplTranslateClient implements TranslateClient {
     private static final Logger logger = LoggerFactory.getLogger(DeeplTranslateClient.class);

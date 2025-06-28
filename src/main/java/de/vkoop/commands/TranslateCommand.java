@@ -10,4 +10,5 @@ import picocli.CommandLine.Command;
     description = "Translation commands using DeepL API",
     subcommands = { TextCommand.class, JsonCommand.class }
 )
-public class TranslateCommand {}
+public class TranslateCommand {
+}
