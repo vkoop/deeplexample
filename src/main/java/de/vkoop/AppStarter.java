@@ -13,6 +13,8 @@ import picocli.CommandLine.Command;
 public class AppStarter {
 
     public static void main(String[] args) {
+        System.setProperty("translate.client", "ollama");
+
         System.exit(SpringApplication.exit(SpringApplication.run(AppStarter.class, args)));
     }
 
@@ -33,10 +35,7 @@ public class AppStarter {
         }
         
         @Override
-        public void run() {
-            // show help
-
-        }
+        public void run() {}
         
         @Override
         public void run(String... args) {

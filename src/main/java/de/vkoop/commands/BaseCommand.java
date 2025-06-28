@@ -31,6 +31,9 @@ public abstract class BaseCommand implements Runnable {
     @CommandLine.Option(names = "-t", split = ",")
     public List<String> targetLanguages;
 
+    @CommandLine.Option(names = "-n")
+    private String translationClientName;
+
     @Autowired
     protected TranslateClient translateClient;
 
