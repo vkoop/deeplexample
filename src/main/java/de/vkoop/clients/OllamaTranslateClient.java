@@ -29,7 +29,7 @@ public class OllamaTranslateClient implements TranslateClient {
 
     // Common language codes supported by most LLMs
     private static final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(
-        "EN", "DE", "fr", "es", "it", "nl", "pl", "pt", "ru", "zh", "ja", "ko"
+        "EN", "DE", "FR", "ES", "IT", "NL", "PL", "PT", "RU", "ZH", "JA", "KO"
     ));
 
     @Autowired

@@ -13,8 +13,6 @@ import picocli.CommandLine.Command;
 public class AppStarter {
 
     public static void main(String[] args) {
-        System.setProperty("translate.client", "ollama");
-
         System.exit(SpringApplication.exit(SpringApplication.run(AppStarter.class, args)));
     }
 
@@ -26,10 +24,10 @@ public class AppStarter {
         mixinStandardHelpOptions = true
     )
     public static class AppCommand implements Runnable, CommandLineRunner, ExitCodeGenerator {
-        
+
         private final CommandLine.IFactory factory;
         private int exitCode;
-        
+
         public AppCommand(CommandLine.IFactory factory) {
             this.factory = factory;
         }
