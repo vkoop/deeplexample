@@ -35,7 +35,6 @@ public class OllamaTranslateClient implements TranslateClient {
     @Autowired
     public OllamaTranslateClient(OllamaChatModel chatModel) {
         this.chatModel = chatModel;
-        logger.info("OllamaTranslateClient initialized");
     }
 
     @Override
