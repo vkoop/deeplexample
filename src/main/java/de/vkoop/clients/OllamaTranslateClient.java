@@ -35,7 +35,7 @@ public class OllamaTranslateClient implements TranslateClient {
         "EN", "DE", "FR", "ES", "IT", "NL", "PL", "PT", "RU", "ZH", "JA", "KO",
         "AR", "BG", "CS", "DA", "EL", "ET", "FI", "HU", "ID", "LT", "LV", 
         "NO", "RO", "SK", "SL", "SV", "TR", "UK", "VI", "HE", "HI", "TH", 
-        "CA", "HR", "IS", "MS", "FA", "SR", "BS", "MK", "GA", "SQ"
+        "CA", "HR", "IS", "MS", "FA", "SR", "BS", "MK", "GA", "SQ", "NB", "PT-BR"
     ));
 
     @Autowired
