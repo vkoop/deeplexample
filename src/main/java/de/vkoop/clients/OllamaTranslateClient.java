@@ -24,12 +24,18 @@ import java.util.Set;
 public class OllamaTranslateClient implements TranslateClient {
 
     private static final Logger logger = LoggerFactory.getLogger(OllamaTranslateClient.class);
-    
+    private static final String TRANSLATION_PROMPT = """
+            You are a professional translator. Translate the provided text from '%s' to '%s'.\s
+            Return ONLY the translated text without any explanations, notes, or additional content.""";
+
     private final ChatModel chatModel;
 
     // Common language codes supported by most LLMs
     private static final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(
-        "EN", "DE", "FR", "ES", "IT", "NL", "PL", "PT", "RU", "ZH", "JA", "KO"
+        "EN", "DE", "FR", "ES", "IT", "NL", "PL", "PT", "RU", "ZH", "JA", "KO",
+        "AR", "BG", "CS", "DA", "EL", "ET", "FI", "HU", "ID", "LT", "LV", 
+        "NO", "RO", "SK", "SL", "SV", "TR", "UK", "VI", "HE", "HI", "TH", 
+        "CA", "HR", "IS", "MS", "FA", "SR", "BS", "MK", "GA", "SQ"
     ));
 
     @Autowired
@@ -89,9 +95,7 @@ public class OllamaTranslateClient implements TranslateClient {
 
     private static Prompt getPrompt(String text, String sourceLanguage, String targetLanguage) {
         SystemMessage systemMessage = new SystemMessage(
-                "You are a professional translator. " +
-                "Translate the provided text from " + sourceLanguage + " to " + targetLanguage + ". " +
-                "Return ONLY the translated text without any explanations, notes, or additional content."
+                TRANSLATION_PROMPT.formatted(sourceLanguage, targetLanguage)
         );
 
         // Create user message with the text to translate
