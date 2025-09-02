@@ -21,7 +21,7 @@ public class TextCommand extends BaseCommand {
 
         var translatedCsvLine = targetLanguages
                 .stream()
-                .parallel()
+                // .parallel()
                 .map(targetLanguage ->
                         translateClient
                                 .translate(text, sourceLanguage, targetLanguage)
