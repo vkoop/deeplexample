@@ -1,5 +1,7 @@
 package de.vkoop.commands;
 
+import de.vkoop.exceptions.ConfigurationException;
+import de.vkoop.exceptions.TranslationException;
 import de.vkoop.interfaces.TranslateClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,24 +73,94 @@ public class BaseCommandTest {
         // Arrange
         testCommand.sourceLanguage = "DE";
         testCommand.targetLanguages = Arrays.asList("EN", "FR");
-        
+
         // Mock supported languages - needed for validateLanguages
         Set<String> supportedSourceLanguages = new HashSet<>();
         supportedSourceLanguages.add(SOURCE_LANGUAGE);
         supportedSourceLanguages.add("EN");
         supportedSourceLanguages.add("FR");
-        
+
         Set<String> supportedTargetLanguages = new HashSet<>();
         supportedTargetLanguages.add("EN");
         supportedTargetLanguages.add("DE");
         supportedTargetLanguages.add("FR");
-        
+
         // Using lenient() to avoid UnnecessaryStubbingException
         when(translateClient.getSupportedSourceLanguages()).thenReturn(supportedSourceLanguages);
         when(translateClient.getSupportedTargetLanguages()).thenReturn(supportedTargetLanguages);
 
         // Act & Assert (no exception should be thrown)
         testCommand.validateLanguages();
+    }
+
+    @Test
+    void validateLanguages_shouldThrowTranslationExceptionForUnsupportedSourceLanguage() {
+        // Arrange
+        testCommand.sourceLanguage = "INVALID";
+        testCommand.targetLanguages = Arrays.asList("EN", "FR");
+
+        Set<String> supportedSourceLanguages = Set.of("DE", "EN", "FR");
+        Set<String> supportedTargetLanguages = Set.of("EN", "DE", "FR");
+
+        when(translateClient.getSupportedSourceLanguages()).thenReturn(supportedSourceLanguages);
+        when(translateClient.getSupportedTargetLanguages()).thenReturn(supportedTargetLanguages);
+
+        // Act & Assert
+        TranslationException exception = assertThrows(TranslationException.class, () -> {
+            testCommand.validateLanguages();
+        });
+
+        assertEquals("Unsupported source language: INVALID", exception.getMessage());
+    }
+
+    @Test
+    void validateLanguages_shouldThrowTranslationExceptionForUnsupportedTargetLanguage() {
+        // Arrange
+        testCommand.sourceLanguage = "DE";
+        testCommand.targetLanguages = Arrays.asList("EN", "INVALID");
+
+        Set<String> supportedSourceLanguages = Set.of("DE", "EN", "FR");
+        Set<String> supportedTargetLanguages = Set.of("EN", "DE", "FR");
+
+        when(translateClient.getSupportedSourceLanguages()).thenReturn(supportedSourceLanguages);
+        when(translateClient.getSupportedTargetLanguages()).thenReturn(supportedTargetLanguages);
+
+        // Act & Assert
+        TranslationException exception = assertThrows(TranslationException.class, () -> {
+            testCommand.validateLanguages();
+        });
+
+        assertEquals("Unsupported target language: INVALID", exception.getMessage());
+    }
+
+    @Test
+    void loadConfigFromFile_shouldThrowConfigurationExceptionWhenNoAuthProvided() {
+        // Arrange
+        testCommand.configurationFile = null;
+        testCommand.loadConfigFromHome = false;
+        testCommand.authKey = null;
+
+        // Act & Assert
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> {
+            testCommand.loadConfigFromFile();
+        });
+
+        assertEquals("No authentication provided will exit.", exception.getMessage());
+    }
+
+    @Test
+    void loadConfigFromFile_shouldThrowConfigurationExceptionForNonexistentFile() {
+        // Arrange
+        File nonExistentFile = new File(tempDir.toFile(), "nonexistent.properties");
+        testCommand.configurationFile = nonExistentFile;
+        testCommand.authKey = null;
+
+        // Act & Assert
+        ConfigurationException exception = assertThrows(ConfigurationException.class, () -> {
+            testCommand.loadConfigFromFile();
+        });
+
+        assertEquals("Failed to load file: " + nonExistentFile, exception.getMessage());
     }
 
 

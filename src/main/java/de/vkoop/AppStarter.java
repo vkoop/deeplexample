@@ -1,6 +1,8 @@
 package de.vkoop;
 
 import de.vkoop.commands.TranslateCommand;
+import de.vkoop.exceptions.ConfigurationException;
+import de.vkoop.exceptions.TranslationException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -37,7 +39,19 @@ public class AppStarter {
         
         @Override
         public void run(String... args) {
-            exitCode = new CommandLine(this, factory).execute(args);
+            CommandLine commandLine = new CommandLine(this, factory);
+
+            // Configure exit codes for our custom exceptions
+            commandLine.setExitCodeExceptionMapper(exception -> {
+                if (exception instanceof ConfigurationException) {
+                    return 2;
+                } else if (exception instanceof TranslationException) {
+                    return 3;
+                }
+                return 1; // Default error code
+            });
+
+            exitCode = commandLine.execute(args);
         }
         
         @Override

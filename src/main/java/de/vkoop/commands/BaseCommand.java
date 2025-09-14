@@ -1,5 +1,7 @@
 package de.vkoop.commands;
 
+import de.vkoop.exceptions.ConfigurationException;
+import de.vkoop.exceptions.TranslationException;
 import de.vkoop.interfaces.TranslateClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +42,13 @@ public abstract class BaseCommand implements Runnable {
     protected void validateLanguages() {
         if (!translateClient.getSupportedSourceLanguages().contains(sourceLanguage)) {
             logger.error("Unsupported source language: {}", sourceLanguage);
-            System.exit(1);
+            throw new TranslationException("Unsupported source language: " + sourceLanguage);
         }
 
         for (String targetLanguage : targetLanguages) {
             if (!translateClient.getSupportedTargetLanguages().contains(targetLanguage)) {
                 logger.error("Unsupported target language: {}", targetLanguage);
-                System.exit(1);
+                throw new TranslationException("Unsupported target language: " + targetLanguage);
             }
         }
     }
@@ -54,7 +56,7 @@ public abstract class BaseCommand implements Runnable {
     protected void loadConfigFromFile() {
         if (authKey == null && configurationFile == null && !loadConfigFromHome) {
             logger.error("No authentication provided will exit.");
-            System.exit(1);
+            throw new ConfigurationException("No authentication provided will exit.");
         } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
             try (FileInputStream inStream = (loadConfigFromHome)
@@ -73,7 +75,7 @@ public abstract class BaseCommand implements Runnable {
                 translateClient.setAuthKey(this.authKey);
             } catch (IOException e) {
                 logger.error("Failed to load file: {}", configurationFile);
-                System.exit(1);
+                throw new ConfigurationException("Failed to load file: " + configurationFile, e);
             }
         }
     }
