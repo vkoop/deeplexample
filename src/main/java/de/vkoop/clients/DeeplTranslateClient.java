@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.vkoop.data.Response;
 import de.vkoop.exceptions.TranslationException;
 import de.vkoop.interfaces.TranslateClient;
-import de.vkoop.util.SafeUrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -118,12 +118,14 @@ public class DeeplTranslateClient implements TranslateClient {
         }
 
         try {
-            final URI uri = SafeUrlBuilder.forDeeplTranslate()
-                .addParameter("auth_key", authKey)
-                .addParameter("text", text)
-                .addParameter("target_lang", targetLanguage)
-                .addParameter("source_lang", sourceLanguage)
-                .buildSafe();
+            final URI uri = UriComponentsBuilder
+                .fromHttpUrl("https://api-free.deepl.com/v2/translate")
+                .queryParam("auth_key", authKey)
+                .queryParam("text", text)
+                .queryParam("target_lang", targetLanguage)
+                .queryParam("source_lang", sourceLanguage)
+                .build()
+                .toUri();
 
             var client = getHttpClient()
                     .send(

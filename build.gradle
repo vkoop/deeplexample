@@ -26,6 +26,7 @@ application {
 dependencies {
     // Spring Boot dependencies
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework:spring-web'  // For UriComponentsBuilder
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     
     // Picocli dependencies
