@@ -8,8 +8,8 @@ spring:
     ollama:
       chat:
         options:
-          model: openai/gpt-oss-20b
-      base-url: http://10.1.1.62:1234
+          model: gpt-oss:20b
+      base-url: http://10.1.0.12:11434
 
 logging:
   level:
