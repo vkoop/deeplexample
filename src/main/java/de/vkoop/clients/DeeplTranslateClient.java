@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.vkoop.data.Response;
+import de.vkoop.exceptions.TranslationException;
 import de.vkoop.interfaces.TranslateClient;
+import de.vkoop.util.SafeUrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,12 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -111,16 +110,20 @@ public class DeeplTranslateClient implements TranslateClient {
 
     @Override
     public Response translate(String text, String sourceLanguage, String targetLanguage) {
-        try {
+        if (text == null || text.trim().isEmpty()) {
+            throw new TranslationException("Text cannot be null or empty");
+        }
+        if (authKey == null || authKey.trim().isEmpty()) {
+            throw new TranslationException("Authentication key is required");
+        }
 
-            final URI uri = new URI(String.format("https://api-free.deepl.com/v2/translate?" +
-                    "auth_key=%s&text=%s" +
-                    "&target_lang=%s" +
-                    "&source_lang=%s",
-                    URLEncoder.encode(authKey, StandardCharsets.UTF_8),
-                    URLEncoder.encode(text, StandardCharsets.UTF_8),
-                    URLEncoder.encode(targetLanguage, StandardCharsets.UTF_8),
-                    URLEncoder.encode(sourceLanguage, StandardCharsets.UTF_8)));
+        try {
+            final URI uri = SafeUrlBuilder.forDeeplTranslate()
+                .addParameter("auth_key", authKey)
+                .addParameter("text", text)
+                .addParameter("target_lang", targetLanguage)
+                .addParameter("source_lang", sourceLanguage)
+                .buildSafe();
 
             var client = getHttpClient()
                     .send(
@@ -150,12 +153,15 @@ public class DeeplTranslateClient implements TranslateClient {
             }
 
             return objectMapper.readValue(responseBody, Response.class);
-        } catch (InterruptedException | URISyntaxException | IOException e) {
+        } catch (InterruptedException | IOException e) {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
             logger.error("Exception during translation", e);
-            return null;
+            throw new TranslationException("Translation API call failed", e);
+        } catch (IllegalArgumentException e) {
+            logger.error("Failed to construct API URL", e);
+            throw new TranslationException("Failed to construct API URL", e);
         }
     }
     

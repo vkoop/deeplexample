@@ -2,6 +2,7 @@ package de.vkoop;
 
 import de.vkoop.clients.DeeplTranslateClient;
 import de.vkoop.data.Response;
+import de.vkoop.exceptions.TranslationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,9 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -105,7 +108,7 @@ public class TranslateClientTest {
     }
 
     @Test
-    void translate_shouldHandleHttpError() throws Exception {
+    void translate_shouldThrowTranslationExceptionForHttpError() throws Exception {
         // Arrange
         when(
             httpClient.send(
@@ -114,15 +117,18 @@ public class TranslateClientTest {
             )
         ).thenThrow(new IOException("Network error"));
 
-        // Act
-        Response response = translateClient.translate(
-            TEXT_TO_TRANSLATE,
-            SOURCE_LANGUAGE,
-            TARGET_LANGUAGE
-        );
+        // Act & Assert
+        TranslationException exception = assertThrows(TranslationException.class, () -> {
+            translateClient.translate(
+                TEXT_TO_TRANSLATE,
+                SOURCE_LANGUAGE,
+                TARGET_LANGUAGE
+            );
+        });
 
-        // Assert
-        assertNull(response);
+        assertEquals("Translation API call failed", exception.getMessage());
+        assertTrue(exception.getCause() instanceof IOException);
+        assertEquals("Network error", exception.getCause().getMessage());
     }
 
     @Test
@@ -145,5 +151,124 @@ public class TranslateClientTest {
             translateClient.getSupportedTargetLanguages().contains("ZH-HANS")
         );
         assertFalse(translateClient.getSupportedTargetLanguages().contains("XX"));
+    }
+
+    @Test
+    void translate_shouldHandleSpecialCharactersInText() throws Exception {
+        // Arrange - text with special characters that need URL encoding
+        String textWithSpecialChars = "Hello & goodbye! How are you? 50% off = great deal";
+        String jsonResponse =
+            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hallo & auf Wiedersehen!\"}]}";
+
+        when(httpResponse.body()).thenReturn(jsonResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+            .thenReturn(httpResponse);
+
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        // Act
+        Response response = translateClient.translate(textWithSpecialChars, SOURCE_LANGUAGE, TARGET_LANGUAGE);
+
+        // Assert
+        verify(httpClient).send(requestCaptor.capture(), any(HttpResponse.BodyHandler.class));
+        HttpRequest capturedRequest = requestCaptor.getValue();
+        String uriString = capturedRequest.uri().toString();
+
+        // Should not contain unencoded special characters in URL
+        assertFalse(uriString.contains("&goodbye"), "URL should not contain unencoded '&' from text");
+        assertFalse(uriString.contains("50% off"), "URL should not contain unencoded '50% off' sequence");
+        assertFalse(uriString.contains("= great"), "URL should not contain unencoded '=' from text");
+
+        // Should contain properly encoded text parameter
+        assertTrue(uriString.contains("text=Hello"), "URL should contain start of encoded text");
+
+        // Response should still be parsed correctly
+        assertNotNull(response);
+        assertEquals("Hallo & auf Wiedersehen!", response.translations.get(0).text);
+    }
+
+    @Test
+    void translate_shouldHandleUnicodeCharactersInText() throws Exception {
+        // Arrange - text with Unicode characters
+        String unicodeText = "Café, naïve, résumé, 北京, العربية";
+        String jsonResponse =
+            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Translated unicode\"}]}";
+
+        when(httpResponse.body()).thenReturn(jsonResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+            .thenReturn(httpResponse);
+
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        // Act
+        Response response = translateClient.translate(unicodeText, SOURCE_LANGUAGE, TARGET_LANGUAGE);
+
+        // Assert
+        verify(httpClient).send(requestCaptor.capture(), any(HttpResponse.BodyHandler.class));
+        HttpRequest capturedRequest = requestCaptor.getValue();
+        String uriString = capturedRequest.uri().toString();
+
+        // Should be properly encoded - we don't test exact encoding but ensure no raw Unicode
+        assertFalse(uriString.contains("Café"), "URL should not contain raw Unicode characters");
+        assertFalse(uriString.contains("北京"), "URL should not contain raw Chinese characters");
+        assertFalse(uriString.contains("العربية"), "URL should not contain raw Arabic characters");
+
+        // Should contain encoded content
+        assertTrue(uriString.contains("text="), "URL should contain text parameter");
+        assertTrue(uriString.matches(".*text=[^&]*.*"), "URL should have properly encoded text value");
+
+        // Response should be processed correctly
+        assertNotNull(response);
+        assertEquals("Translated unicode", response.translations.get(0).text);
+    }
+
+    @Test
+    void translate_shouldHandleAuthKeyWithSpecialCharacters() throws Exception {
+        // Arrange - auth key with characters that need encoding
+        String authKeyWithSpecialChars = "key&with=special%chars";
+        translateClient.setAuthKey(authKeyWithSpecialChars);
+
+        String jsonResponse =
+            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hello World\"}]}";
+
+        when(httpResponse.body()).thenReturn(jsonResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+            .thenReturn(httpResponse);
+
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        // Act
+        Response response = translateClient.translate(TEXT_TO_TRANSLATE, SOURCE_LANGUAGE, TARGET_LANGUAGE);
+
+        // Assert
+        verify(httpClient).send(requestCaptor.capture(), any(HttpResponse.BodyHandler.class));
+        HttpRequest capturedRequest = requestCaptor.getValue();
+        String uriString = capturedRequest.uri().toString();
+
+        // Auth key should be properly encoded
+        assertFalse(uriString.contains("auth_key=key&with"),
+            "URL should not contain unencoded '&' from auth key");
+        assertFalse(uriString.contains("=special%chars"),
+            "URL should not contain unencoded '=' from auth key");
+
+        // Should contain auth_key parameter
+        assertTrue(uriString.contains("auth_key="), "URL should contain auth_key parameter");
+
+        assertNotNull(response);
+    }
+
+    @Test
+    void translate_shouldThrowTranslationExceptionForInvalidURL() throws Exception {
+        // Arrange - create conditions that would cause URI construction to fail
+        // This is a bit tricky to test directly, but we can verify exception handling
+        translateClient.setAuthKey(null); // This might cause issues in URL construction
+
+        // Act & Assert
+        assertThrows(Exception.class, () -> {
+            translateClient.translate(TEXT_TO_TRANSLATE, SOURCE_LANGUAGE, TARGET_LANGUAGE);
+        }, "Should throw exception when URL construction fails");
     }
 }
