@@ -119,7 +119,7 @@ public class DeeplTranslateClient implements TranslateClient {
 
         try {
             final URI uri = UriComponentsBuilder
-                .fromHttpUrl("https://api-free.deepl.com/v2/translate")
+                .fromUriString("https://api-free.deepl.com/v2/translate")
                 .queryParam("auth_key", authKey)
                 .queryParam("text", text)
                 .queryParam("target_lang", targetLanguage)
