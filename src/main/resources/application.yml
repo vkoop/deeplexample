@@ -1,0 +1,17 @@
+# Spring Boot application properties
+spring:
+  main:
+    banner-mode: off
+    web-application-type: none
+    log-startup-info: false
+  ai:
+    ollama:
+      chat:
+        options:
+          model: openai/gpt-oss-20b
+      base-url: http://10.1.1.62:1234
+
+logging:
+  level:
+    root: INFO
+    de.vkoop: DEBUG
