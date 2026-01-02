@@ -1,5 +1,11 @@
-package de.vkoop;
+package de.vkoop.commands;
 
+import de.vkoop.exceptions.ConfigurationException;
+import de.vkoop.exceptions.TranslationException;
+import de.vkoop.interfaces.TranslateClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -8,38 +14,41 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-abstract class BaseCommand implements Runnable {
+public abstract class BaseCommand implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(BaseCommand.class);
+    
     @CommandLine.Option(names = "-c")
-    File configurationFile;
+    public File configurationFile;
 
     @CommandLine.Option(names = "-f", description = "load configuration from home. E.g. ~/.transcli.properties")
-    boolean loadConfigFromHome;
+    public boolean loadConfigFromHome;
 
     @CommandLine.Option(names = "-k")
-    String authKey;
+    public String authKey;
 
     @CommandLine.Option(names = "-s")
-    String sourceLanguage;
+    public String sourceLanguage;
 
     @CommandLine.Option(names = "-t", split = ",")
-    List<String> targetLanguages;
+    public List<String> targetLanguages;
 
-    private TranslateClient translateClient;
+    @CommandLine.Option(names = "-n")
+    private String translationClientName;
+
+    @Autowired
+    protected TranslateClient translateClient;
 
     protected void validateLanguages() {
-        if (!TranslateClient.SUPPORTED_SOURCE_LANGUAGES.contains(sourceLanguage)) {
+        if (!translateClient.getSupportedSourceLanguages().contains(sourceLanguage)) {
             logger.error("Unsupported source language: {}", sourceLanguage);
-            System.exit(1);
+            throw new TranslationException("Unsupported source language: " + sourceLanguage);
         }
 
         for (String targetLanguage : targetLanguages) {
-            if (!TranslateClient.SUPPORTED_TARGET_LANGUAGES.contains(targetLanguage)) {
+            if (!translateClient.getSupportedTargetLanguages().contains(targetLanguage)) {
                 logger.error("Unsupported target language: {}", targetLanguage);
-                System.exit(1);
+                throw new TranslationException("Unsupported target language: " + targetLanguage);
             }
         }
     }
@@ -47,7 +56,7 @@ abstract class BaseCommand implements Runnable {
     protected void loadConfigFromFile() {
         if (authKey == null && configurationFile == null && !loadConfigFromHome) {
             logger.error("No authentication provided will exit.");
-            System.exit(1);
+            throw new ConfigurationException("No authentication provided will exit.");
         } else if (loadConfigFromHome || configurationFile != null) {
             Properties properties = new Properties();
             try (FileInputStream inStream = (loadConfigFromHome)
@@ -62,19 +71,16 @@ abstract class BaseCommand implements Runnable {
                 Optional.ofNullable(properties.getProperty("targetLanguages"))
                         .map(value -> List.of(value.split(",")))
                         .ifPresent(value -> this.targetLanguages = value);
+
+                translateClient.setAuthKey(this.authKey);
             } catch (IOException e) {
                 logger.error("Failed to load file: {}", configurationFile);
-                System.exit(1);
+                throw new ConfigurationException("Failed to load file: " + configurationFile, e);
             }
         }
     }
 
-    protected TranslateClient getTranslateClient() {
-        if (null == translateClient) {
-            translateClient = new TranslateClient(authKey);
-        }
-        return translateClient;
-    }
+
 
     public void setTranslateClient(TranslateClient translateClient) {
         this.translateClient = translateClient;

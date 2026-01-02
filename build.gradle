@@ -1,10 +1,15 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '3.5.3'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 group 'org.example'
 version '1.0-SNAPSHOT'
@@ -19,28 +24,37 @@ application {
 }
 
 dependencies {
+    // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework:spring-web'  // For UriComponentsBuilder
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    // Picocli dependencies
     implementation "info.picocli:picocli:$picoliVersion"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'info.picocli:picocli-spring-boot-starter:4.7.7'
     annotationProcessor "info.picocli:picocli-codegen:$picoliVersion"
 
+    // Jackson dependencies
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
 
-    // Logging dependencies
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'
 
-
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:' + junitVersion
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:' + junitVersion
-
-    // https://mvnrepository.com/artifact/org.mockito/mockito-core
-
-
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
-// https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: mockitoVersion
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+    
+    // Testcontainers
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:ollama'
+    testImplementation 'org.testcontainers:mockserver'
+    testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
 }
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:1.0.1"
+    }
+}
+
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]

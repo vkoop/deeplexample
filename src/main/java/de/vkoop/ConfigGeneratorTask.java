@@ -1,5 +1,8 @@
 package de.vkoop;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 
 import java.io.Console;
@@ -9,9 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Component
 @Command(name = "generate-config", description = "Generate .transcli.properties configuration file")
 public class ConfigGeneratorTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ConfigGeneratorTask.class);
