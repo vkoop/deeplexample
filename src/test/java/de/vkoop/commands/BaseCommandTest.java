@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -43,8 +42,7 @@ public class BaseCommandTest {
     Path tempDir;
 
     private TestCommand testCommand;
-    private final ByteArrayOutputStream errContent =
-        new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
     @BeforeEach
     void setUp() {
@@ -55,7 +53,7 @@ public class BaseCommandTest {
 
     @Test
     void loadConfigFromFile_shouldLoadConfigFromSpecifiedFile()
-        throws IOException {
+            throws IOException {
         // Arrange
         testCommand.configurationFile = createConfigFile();
 
@@ -162,8 +160,6 @@ public class BaseCommandTest {
 
         assertEquals("Failed to load file: " + nonExistentFile, exception.getMessage());
     }
-
-
 
     private File createConfigFile() throws IOException {
         File configFile = tempDir.resolve("config.properties").toFile();

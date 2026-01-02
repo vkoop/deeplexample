@@ -46,7 +46,7 @@ public class TranslateClientTest {
     @BeforeEach
     void setUp() throws Exception {
         // Create a test instance with the mocked HttpClient
-        translateClient = new DeeplTranslateClient() {
+        translateClient = new DeeplTranslateClient("https://api-free.deepl.com/v2/translate") {
             @Override
             protected HttpClient createHttpClient() {
                 return httpClient;
@@ -59,34 +59,30 @@ public class TranslateClientTest {
     @Test
     void translate_shouldSendCorrectRequest() throws Exception {
         // Arrange
-        String jsonResponse =
-            "{\"translations\":[{\"detected_source_language\":\"DE\",\"text\":\"Hello World\"}]}";
+        String jsonResponse = """
+                {"translations":[{"detected_source_language":"DE","text":"Hello World"}]}""";
         when(httpResponse.body()).thenReturn(jsonResponse);
         // Mock the status code to return 200 (Success)
         when(httpResponse.statusCode()).thenReturn(200);
         when(
-            httpClient.send(
-                any(HttpRequest.class),
-                any(HttpResponse.BodyHandler.class)
-            )
-        ).thenReturn(httpResponse);
+                httpClient.send(
+                        any(HttpRequest.class),
+                        any(HttpResponse.BodyHandler.class)))
+                .thenReturn(httpResponse);
 
         ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(
-            HttpRequest.class
-        );
+                HttpRequest.class);
 
         // Act
         Response response = translateClient.translate(
-            TEXT_TO_TRANSLATE,
-            SOURCE_LANGUAGE,
-            TARGET_LANGUAGE
-        );
+                TEXT_TO_TRANSLATE,
+                SOURCE_LANGUAGE,
+                TARGET_LANGUAGE);
 
         // Assert
         verify(httpClient).send(
-            requestCaptor.capture(),
-            any(HttpResponse.BodyHandler.class)
-        );
+                requestCaptor.capture(),
+                any(HttpResponse.BodyHandler.class));
 
         HttpRequest capturedRequest = requestCaptor.getValue();
         URI uri = capturedRequest.uri();
@@ -96,7 +92,7 @@ public class TranslateClientTest {
         assertTrue(uri.toString().contains("target_lang=" + TARGET_LANGUAGE));
         // UriComponentsBuilder encodes spaces as %20 (more standard than +)
         assertTrue(uri.toString().contains("text=Hallo") && uri.toString().contains("Welt"),
-            "URL should contain the text 'Hallo Welt' (encoded)");
+                "URL should contain the text 'Hallo Welt' (encoded)");
 
         // Verify response is not null before accessing its properties
         assertTrue(response != null, "Response should not be null");
@@ -104,28 +100,25 @@ public class TranslateClientTest {
         assertTrue(!response.translations.isEmpty(), "Response translations should not be empty");
         assertEquals(TRANSLATED_TEXT, response.translations.get(0).text);
         assertEquals(
-            SOURCE_LANGUAGE,
-            response.translations.get(0).detectedSourceLanguage
-        );
+                SOURCE_LANGUAGE,
+                response.translations.get(0).detectedSourceLanguage);
     }
 
     @Test
     void translate_shouldThrowTranslationExceptionForHttpError() throws Exception {
         // Arrange
         when(
-            httpClient.send(
-                any(HttpRequest.class),
-                any(HttpResponse.BodyHandler.class)
-            )
-        ).thenThrow(new IOException("Network error"));
+                httpClient.send(
+                        any(HttpRequest.class),
+                        any(HttpResponse.BodyHandler.class)))
+                .thenThrow(new IOException("Network error"));
 
         // Act & Assert
         TranslationException exception = assertThrows(TranslationException.class, () -> {
             translateClient.translate(
-                TEXT_TO_TRANSLATE,
-                SOURCE_LANGUAGE,
-                TARGET_LANGUAGE
-            );
+                    TEXT_TO_TRANSLATE,
+                    SOURCE_LANGUAGE,
+                    TARGET_LANGUAGE);
         });
 
         assertEquals("Translation API call failed", exception.getMessage());
@@ -147,11 +140,9 @@ public class TranslateClientTest {
         // Act & Assert
         assertTrue(translateClient.getSupportedTargetLanguages().contains("DE"));
         assertTrue(
-            translateClient.getSupportedTargetLanguages().contains("EN-US")
-        );
+                translateClient.getSupportedTargetLanguages().contains("EN-US"));
         assertTrue(
-            translateClient.getSupportedTargetLanguages().contains("ZH-HANS")
-        );
+                translateClient.getSupportedTargetLanguages().contains("ZH-HANS"));
         assertFalse(translateClient.getSupportedTargetLanguages().contains("XX"));
     }
 
@@ -159,13 +150,12 @@ public class TranslateClientTest {
     void translate_shouldHandleSpecialCharactersInText() throws Exception {
         // Arrange - text with special characters that need URL encoding
         String textWithSpecialChars = "Hello & goodbye! How are you? 50% off = great deal";
-        String jsonResponse =
-            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hallo & auf Wiedersehen!\"}]}";
+        String jsonResponse = "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hallo & auf Wiedersehen!\"}]}";
 
         when(httpResponse.body()).thenReturn(jsonResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-            .thenReturn(httpResponse);
+                .thenReturn(httpResponse);
 
         ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
 
@@ -194,23 +184,25 @@ public class TranslateClientTest {
     void translate_shouldHandleUnicodeCharactersInText() throws Exception {
         // Arrange - text with Unicode characters
         String unicodeText = "Café, naïve, résumé, 北京, العربية";
-        String jsonResponse =
-            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Translated unicode\"}]}";
+        String jsonResponse = "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Translated unicode\"}]}";
 
         when(httpResponse.body()).thenReturn(jsonResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-            .thenReturn(httpResponse);
+                .thenReturn(httpResponse);
 
         // Act
         Response response = translateClient.translate(unicodeText, SOURCE_LANGUAGE, TARGET_LANGUAGE);
 
-        // Assert - Focus on the most important aspect: it should work without throwing exceptions
+        // Assert - Focus on the most important aspect: it should work without throwing
+        // exceptions
         assertNotNull(response);
         assertEquals("Translated unicode", response.translations.get(0).text);
 
-        // UriComponentsBuilder handles Unicode encoding properly - we trust Spring's implementation
-        // The key security benefit is that it prevents injection attacks through proper encoding
+        // UriComponentsBuilder handles Unicode encoding properly - we trust Spring's
+        // implementation
+        // The key security benefit is that it prevents injection attacks through proper
+        // encoding
     }
 
     @Test
@@ -219,13 +211,12 @@ public class TranslateClientTest {
         String authKeyWithSpecialChars = "key&with=special%chars";
         translateClient.setAuthKey(authKeyWithSpecialChars);
 
-        String jsonResponse =
-            "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hello World\"}]}";
+        String jsonResponse = "{\"translations\":[{\"detected_source_language\":\"EN\",\"text\":\"Hello World\"}]}";
 
         when(httpResponse.body()).thenReturn(jsonResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
-            .thenReturn(httpResponse);
+                .thenReturn(httpResponse);
 
         // Act
         Response response = translateClient.translate(TEXT_TO_TRANSLATE, SOURCE_LANGUAGE, TARGET_LANGUAGE);
@@ -234,7 +225,8 @@ public class TranslateClientTest {
         assertNotNull(response);
         assertEquals("Hello World", response.translations.get(0).text);
 
-        // UriComponentsBuilder handles special character encoding properly - we trust Spring's implementation
+        // UriComponentsBuilder handles special character encoding properly - we trust
+        // Spring's implementation
         // The key security benefit is that it prevents parameter injection attacks
     }
 

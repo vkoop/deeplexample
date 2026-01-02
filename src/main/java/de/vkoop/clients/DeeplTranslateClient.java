@@ -28,82 +28,82 @@ public class DeeplTranslateClient implements TranslateClient {
 
     private static final Set<String> SUPPORTED_SOURCE_LANGUAGES = new HashSet<>(
             Set.of("AR",
-            "BG",
-            "CS",
-            "DA",
-            "DE",
-            "EL",
-            "EN",
-            "ES",
-            "ET",
-            "FI",
-            "FR",
-            "HU",
-            "ID",
-            "IT",
-            "JA",
-            "KO",
-            "LT",
-            "LV",
-            "NB",
-            "NL",
-            "PL",
-            "PT",
-            "RO",
-            "RU",
-            "SK",
-            "SL",
-            "SV",
-            "TR",
-            "UK",
-            "ZH")
-    );
-    
+                    "BG",
+                    "CS",
+                    "DA",
+                    "DE",
+                    "EL",
+                    "EN",
+                    "ES",
+                    "ET",
+                    "FI",
+                    "FR",
+                    "HU",
+                    "ID",
+                    "IT",
+                    "JA",
+                    "KO",
+                    "LT",
+                    "LV",
+                    "NB",
+                    "NL",
+                    "PL",
+                    "PT",
+                    "RO",
+                    "RU",
+                    "SK",
+                    "SL",
+                    "SV",
+                    "TR",
+                    "UK",
+                    "ZH"));
+
     private static final Set<String> SUPPORTED_TARGET_LANGUAGES = new HashSet<>(
             Set.of("AR",
-            "BG",
-            "CS",
-            "DA",
-            "DE",
-            "EL",
-            "EN",
-            "EN-GB",
-            "EN-US",
-            "ES",
-            "ET",
-            "FI",
-            "FR",
-            "HU",
-            "ID",
-            "IT",
-            "JA",
-            "KO",
-            "LT",
-            "LV",
-            "NB",
-            "NL",
-            "PL",
-            "PT",
-            "PT-BR",
-            "PT-PT",
-            "RO",
-            "RU",
-            "SK",
-            "SL",
-            "SV",
-            "TR",
-            "UK",
-            "ZH",
-            "ZH-HANS",
-            "ZH-HANT")
-    );
-
+                    "BG",
+                    "CS",
+                    "DA",
+                    "DE",
+                    "EL",
+                    "EN",
+                    "EN-GB",
+                    "EN-US",
+                    "ES",
+                    "ET",
+                    "FI",
+                    "FR",
+                    "HU",
+                    "ID",
+                    "IT",
+                    "JA",
+                    "KO",
+                    "LT",
+                    "LV",
+                    "NB",
+                    "NL",
+                    "PL",
+                    "PT",
+                    "PT-BR",
+                    "PT-PT",
+                    "RO",
+                    "RU",
+                    "SK",
+                    "SL",
+                    "SV",
+                    "TR",
+                    "UK",
+                    "ZH",
+                    "ZH-HANS",
+                    "ZH-HANT"));
 
     private String authKey;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private HttpClient httpClient;
+    private final String deeplApiUrl;
 
-    public DeeplTranslateClient() {
+    public DeeplTranslateClient(
+            @org.springframework.beans.factory.annotation.Value("${translate.deepl.url:https://api-free.deepl.com/v2/translate}") String deeplApiUrl) {
+        this.deeplApiUrl = deeplApiUrl;
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -119,13 +119,13 @@ public class DeeplTranslateClient implements TranslateClient {
 
         try {
             final URI uri = UriComponentsBuilder
-                .fromUriString("https://api-free.deepl.com/v2/translate")
-                .queryParam("auth_key", authKey)
-                .queryParam("text", text)
-                .queryParam("target_lang", targetLanguage)
-                .queryParam("source_lang", sourceLanguage)
-                .build()
-                .toUri();
+                    .fromUriString(deeplApiUrl)
+                    .queryParam("auth_key", authKey)
+                    .queryParam("text", text)
+                    .queryParam("target_lang", targetLanguage)
+                    .queryParam("source_lang", sourceLanguage)
+                    .build()
+                    .toUri();
 
             var client = getHttpClient()
                     .send(
@@ -166,12 +166,12 @@ public class DeeplTranslateClient implements TranslateClient {
             throw new TranslationException("Failed to construct API URL", e);
         }
     }
-    
+
     @Override
     public Set<String> getSupportedSourceLanguages() {
         return Collections.unmodifiableSet(SUPPORTED_SOURCE_LANGUAGES);
     }
-    
+
     @Override
     public Set<String> getSupportedTargetLanguages() {
         return Collections.unmodifiableSet(SUPPORTED_TARGET_LANGUAGES);

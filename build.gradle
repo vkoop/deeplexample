@@ -41,6 +41,12 @@ dependencies {
 
 
     implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+    
+    // Testcontainers
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:ollama'
+    testImplementation 'org.testcontainers:mockserver'
+    testImplementation 'org.mock-server:mockserver-client-java:5.15.0'
 }
 
 dependencyManagement {
