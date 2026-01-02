@@ -1,5 +1,7 @@
 # DeepL Translations CLI
 
+[![Coverage](.github/badges/jacoco.svg)](https://github.com/vkoop/deeplclient/actions/workflows/ci.yml)
+
 A command-line tool for translating text and JSON files using the DeepL API.
 
 ## Overview
